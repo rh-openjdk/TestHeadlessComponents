@@ -146,11 +146,13 @@ fi
 source ${RFaT}/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
-WORKSPACE=/mnt/workspace
+  WORKSPACE=/mnt/workspace
+  mkdir -p $WORKSPACE
 fi
 
 if [ "x$TMPRESULTS" == "x" ]; then
-    TMPRESULTS=$WORKSPACE
+  TMPRESULTS=$WORKSPACE
+  mkdir -p $TMPRESULTS
 fi
 
 touch $TMPRESULTS/swingComponentTest.txt
