@@ -1,0 +1,42 @@
+name: "test"
+
+on:
+  pull_request:
+    branches:
+      - "*"
+  push:
+    branches:
+      - "*"
+env:
+  jdkver_latest: 20
+
+jobs:
+  test-linux:
+    name: "Linux"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - name: Set env vars
+        run: export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk
+      - name: Run
+        run: ./testHeadlessComponents.sh
