@@ -29,7 +29,7 @@ function installAlternativeJDK() {
     return 0
   fi
   if [ "x$BOOTJDK_ARCHIVE_DIR" == "x" ]; then
-    BOOTJDK_ARCHIVE_DIR=/mnt/workspace/bootjdkarchive
+    BOOTJDK_ARCHIVE_DIR=$WORKSPACE/bootjdkarchive
     mkdir -p $BOOTJDK_ARCHIVE_DIR
     cd $BOOTJDK_ARCHIVE_DIR
     curl -OLJks "https://api.adoptopenjdk.net/v3/binary/latest/$OJDK_VERSION_NUMBER/ga/linux/$ARCH/jdk/hotspot/normal/adoptopenjdk"
