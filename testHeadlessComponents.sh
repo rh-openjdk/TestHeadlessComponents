@@ -146,7 +146,7 @@ fi
 source ${RFaT}/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
-  WORKSPACE=/mnt/workspace
+  WORKSPACE=~/workspace
   mkdir -p $WORKSPACE
 fi
 
