@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# needs OJDK_VERSION_NUMBER and BOOTJDK_DIR variables set
+# needs OJDK_VERSION_NUMBER, JRESDK and BOOTJDK_DIR variables set
 
 set -x
 set -e

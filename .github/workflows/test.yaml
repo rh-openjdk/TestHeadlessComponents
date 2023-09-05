@@ -11,7 +11,7 @@ env:
   jdkver_latest: 20
 
 jobs:
-  test-linux:
+  test-linux-sdk:
     name: "Linux"
     runs-on: "ubuntu-latest"
     strategy:
@@ -38,5 +38,35 @@ jobs:
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: |
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk JRESDK="sdk"
+          ./testHeadlessComponents.sh
+
+  test-linux-jre:
+    name: "Linux"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - name: Run
+        run: |
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
           ./testHeadlessComponents.sh

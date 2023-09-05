@@ -46,7 +46,7 @@ function installAlternativeJDK() {
 
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
-  java -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$OTOOL_jresdk -displayValue=$DISPLAY
+  java -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JRESDK -displayValue=$DISPLAY
 }
 
 function run_swing_component_test_true_unset {
