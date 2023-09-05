@@ -36,7 +36,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
-      - name: Set env vars
-        run: export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk
       - name: Run
-        run: ./testHeadlessComponents.sh
+        run: |
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk
+          ./testHeadlessComponents.sh
