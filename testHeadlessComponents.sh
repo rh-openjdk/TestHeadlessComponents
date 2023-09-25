@@ -155,14 +155,14 @@ if [ "x$TMPRESULTS" == "x" ]; then
   mkdir -p $TMPRESULTS
 fi
 
-touch $TMPRESULTS/swingComponentTest.txt
+touch $TMPRESULTS/testHeadlessComponent.txt
 
 
 pushd $WORKSPACE
 
 popd
 
-LOGFILE=$TMPRESULTS/swingComponentTest.log
+LOGFILE=$TMPRESULTS/testHeadlessComponent.log
 
 installAlternativeJDK
 
@@ -216,8 +216,8 @@ done
 
 let "TESTS = $FAILED + $PASSED + $IGNORED"
 
-XMLREPORT=$TMPRESULTS/swingComponentTest.jtr.xml
-printXmlHeader $PASSED $FAILED $TESTS $IGNORED "swingComponentTest" > $XMLREPORT
+XMLREPORT=$TMPRESULTS/testHeadlessComponent.jtr.xml
+printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
 echo "$BODY" >> $XMLREPORT
 printXmlFooter >> $XMLREPORT
 
