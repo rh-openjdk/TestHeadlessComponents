@@ -49,69 +49,39 @@ function run_java_with_headless {
   java -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JRESDK -displayValue=$DISPLAY
 }
 
-function run_swing_component_test_true_unset {
+function run_swing_component_test_unset {
   TEST_ARGUMENT=$1
+  TEST_BOOL=$2
 
   echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=true and unset display"
+  echo "use -Djava.awt.headless=$TEST_BOOL and unset display"
   echo "---------------------------------------------------------------------"
   unset DISPLAY
-  run_java_with_headless true $TEST_ARGUMENT
+  run_java_with_headless $TEST_BOOL $TEST_ARGUMENT
 
 }
 
-function run_swing_component_test_false_unset {
+function run_swing_component_test_set {
   TEST_ARGUMENT=$1
+  TEST_BOOL=$2
 
   echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=false and unset display"
+  echo "use -Djava.awt.headless=$TEST_BOOL and set display to $XDISPLAY"
   echo "---------------------------------------------------------------------"
-  unset DISPLAY
-  run_java_with_headless false $TEST_ARGUMENT
+  export DISPLAY=$XDISPLAY
+  run_java_with_headless $TEST_BOOL $TEST_ARGUMENT
 
 }
 
-function run_swing_component_test_true_set {
+function run_swing_component_test_fake {
   TEST_ARGUMENT=$1
-
+  TEST_BOOL=$2
+  
   echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=true and set display to :0"
-  echo "---------------------------------------------------------------------"
-  export DISPLAY=':0'
-  run_java_with_headless true $TEST_ARGUMENT
-
-}
-
-function run_swing_component_test_false_set {
-  TEST_ARGUMENT=$1
-
-  echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=false and set display to :0"
-  echo "---------------------------------------------------------------------"
-  export DISPLAY=':0'
-  run_java_with_headless false $TEST_ARGUMENT
-
-}
-
-function run_swing_component_test_true_fake {
-  TEST_ARGUMENT=$1
-
-  echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=true and set display to invalid :666"
+  echo "use -Djava.awt.headless=$TEST_BOOL and set display to invalid :666"
   echo "---------------------------------------------------------------------"
   export DISPLAY=':666'
-  run_java_with_headless true $TEST_ARGUMENT
-}
-
-function run_swing_component_test_false_fake {
-  TEST_ARGUMENT=$1
-
-  echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=false and set display to invalid :666"
-  echo "---------------------------------------------------------------------"
-  export DISPLAY=':666'
-  run_java_with_headless false $TEST_ARGUMENT
-
+  run_java_with_headless $TEST_BOOL $TEST_ARGUMENT
 }
 
 function processResults {
@@ -186,24 +156,23 @@ else
 fi
 
 for testOption in compatible incompatible; do
-  run_swing_component_test_true_unset ${testOption} >> $LOGFILE 2>&1
-  resArray["jre_headless_${testOption}_true_display_unset"]=$?
-  run_swing_component_test_false_unset ${testOption} >> $LOGFILE 2>&1
-  resArray["jre_headless_${testOption}_false_display_unset"]=$?
-
-  if [[ $RUN_ARCH == "aarch64" ||  $RUN_ARCH == *"ppc"* ]] ; then
-    echo "skipping tests with display set, as $RUN_ARCH are server only machines"
-  else
-    run_swing_component_test_true_set ${testOption} >> $LOGFILE 2>&1
-    resArray["jre_headless_${testOption}_true_display_set"]=$?
-    run_swing_component_test_false_set ${testOption} >> $LOGFILE 2>&1
-    resArray["jre_headless_${testOption}_false_display_set"]=$?
-  fi
-
-  run_swing_component_test_true_fake ${testOption} >> $LOGFILE 2>&1
-  resArray["jre_headless_${testOption}_true_display_fake"]=$?
-  run_swing_component_test_false_fake ${testOption} >> $LOGFILE 2>&1
-  resArray["jre_headless_${testOption}_false_display_fake"]=$?
+  for headless in true false; do
+    if [[ "$JRESDK" == "jre" || "$JRESDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
+      run_swing_component_test_unset ${testOption} ${headless} >> $LOGFILE 2>&1
+      resArray["jre_headless_${testOption}_${headless}_display_unset"]=$?
+    fi
+  
+    if [[ "x$XDISPLAY" == *x* ]] ; then
+      echo "skipping tests with display set, as the default display was not defined"
+    else
+      run_swing_component_test_set ${testOption} ${headless} >> $LOGFILE 2>&1
+      resArray["jre_headless_${testOption}_${headless}_display_set"]=$?
+    fi
+    if [[ "$JRESDK" == "jre" || "$JRESDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
+      run_swing_component_test_fake ${testOption} ${headless} >> $LOGFILE 2>&1
+      resArray["jre_headless_${testOption}_${headless}_display_fake"]=$?
+    fi
+  done
 done
 
 popd
