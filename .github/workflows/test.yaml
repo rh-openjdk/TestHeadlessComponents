@@ -8,11 +8,12 @@ on:
     branches:
       - "*"
 env:
-  jdkver_latest: 20
+  jdkver_latest: 21
+  WORKSPACE: /home/runner/workspace
 
 jobs:
-  test-linux-sdk:
-    name: "Linux"
+  test-temurin-sdk:
+    name: "Temurin jdk"
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
@@ -37,36 +38,57 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
-        run: |
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk JRESDK="sdk"
+        run: | 
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jdk"
           ./testHeadlessComponents.sh
+      - name: Pack results
+        if: ${{ always() }}
+        run: |
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+        continue-on-error: true
+        
+  test-temurin-jre:
+    name: "Temurin jre"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - name: Run
+        run: | 
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
+          ./testHeadlessComponents.sh
+      - name: Pack results
+        if: ${{ always() }}
+        run: |
+          tar -cf "results-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: "results-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+        continue-on-error: true
 
-  test-linux-jre:
-    name: "Linux"
-    runs-on: "ubuntu-latest"
-    strategy:
-      fail-fast: false
-      matrix:
-        jdkconf:
-          - JDK 8
-          - JDK 11
-          - JDK 17
-          - JDK Latest
-        include:
-          - jdkconf: JDK 8
-            jdkver: "8"
-          - jdkconf: JDK 11
-            jdkver: "11"
-          - jdkconf: JDK 17
-            jdkver: "17"
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
-      - name: Run
-        run: |
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
-          ./testHeadlessComponents.sh
