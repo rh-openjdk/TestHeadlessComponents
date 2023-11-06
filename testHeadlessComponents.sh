@@ -66,9 +66,9 @@ function run_swing_component_test_set {
   TEST_BOOL=$2
 
   echo "---------------------------------------------------------------------"
-  echo "use -Djava.awt.headless=$TEST_BOOL and set display to $XDISPLAY"
+  echo "use -Djava.awt.headless=$TEST_BOOL and set display to $AVAILABLE_DISPLAY"
   echo "---------------------------------------------------------------------"
-  export DISPLAY=$XDISPLAY
+  export DISPLAY=$AVAILABLE_DISPLAY
   run_java_with_headless $TEST_BOOL $TEST_ARGUMENT
 
 }
@@ -162,7 +162,7 @@ for testOption in compatible incompatible; do
       resArray["jre_headless_${testOption}_${headless}_display_unset"]=$?
     fi
   
-    if [[ "x$XDISPLAY" == *x* ]] ; then
+    if [[ "x$AVAILABLE_DISPLAY" == *x* ]] ; then
       echo "skipping tests with display set, as the default display was not defined"
     else
       run_swing_component_test_set ${testOption} ${headless} >> $LOGFILE 2>&1
