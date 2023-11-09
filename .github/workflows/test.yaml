@@ -115,7 +115,7 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: wget tar
+          install: wget tar git
 
       - uses: actions/checkout@v3
       - name: Set up JDK
