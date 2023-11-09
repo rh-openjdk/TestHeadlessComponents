@@ -117,14 +117,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
-      - uses: msys2/setup-msys2@v2
-        with:
-          update: true
-          install: make
       - name: Run
-        run: make SSLContextInfo SSLSocketInfo ssl-tests
-  test-macos:
-    name: "MacOS"
+        shell: msys2 {0}
+        run: | 
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
+          ./testHeadlessComponents.sh
+  test-macos-jre:
+    name: "MacOS-jre"
     runs-on: "macos-latest"
     strategy:
       fail-fast: false
@@ -149,7 +148,6 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
-        shell: msys2 {0}
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
           ./testHeadlessComponents.sh
