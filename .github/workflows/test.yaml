@@ -122,6 +122,7 @@ jobs:
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
           ./testHeadlessComponents.sh
+          
   test-macos-jre:
     name: "MacOS-jre"
     runs-on: "macos-latest"
