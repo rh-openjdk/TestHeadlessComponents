@@ -112,6 +112,12 @@ jobs:
             jdkver: "17"
     steps:
       - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: wget tar
+
+      - uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
