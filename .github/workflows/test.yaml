@@ -92,3 +92,64 @@ jobs:
           path: "results-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
 
+  test-windows-jre:
+    name: "Windows-jre"
+    runs-on: "windows-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: make
+      - name: Run
+        run: make SSLContextInfo SSLSocketInfo ssl-tests
+  test-macos:
+    name: "MacOS"
+    runs-on: "macos-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - name: Run
+        shell: msys2 {0}
+        run: | 
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
+          ./testHeadlessComponents.sh
