@@ -18,6 +18,29 @@ while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer 
 done
 readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
 
+# detecting platform
+platform="$(uname)"
+if [ "$platform" == "Linux" ]; then
+    # Linux-specific code
+    OS="linux"
+elif [ "$platform" == "Darwin" ]; then
+    # Mac-specific code
+    OS="mac"
+elif [ "$platform" == "CYGWIN_NT-10.0" ]; then
+    # Windows (Cygwin) specific code
+    OS="windows"
+else
+    echo "Unsupported platform"
+    exit 1
+fi
+
+function unwrap_file_to_location() {
+  if [ "$OS" == "mac" -o "$OS" == "linux" ]; then
+    tar --strip-components=1 -xf $1 -C $2
+  elif [ "$OS" == "windows" ]; then
+    unzip $1 -d $2
+  fi
+}
 
 function installAlternativeJDK() {
   ARCH=$( uname -m )
@@ -32,15 +55,15 @@ function installAlternativeJDK() {
     BOOTJDK_ARCHIVE_DIR=$WORKSPACE/bootjdkarchive
     mkdir -p $BOOTJDK_ARCHIVE_DIR
     cd $BOOTJDK_ARCHIVE_DIR
-    curl -OLJks "https://api.adoptopenjdk.net/v3/binary/latest/$OJDK_VERSION_NUMBER/ga/linux/$ARCH/jdk/hotspot/normal/adoptopenjdk"
+    curl -OLJks "https://api.adoptopenjdk.net/v3/binary/latest/$OJDK_VERSION_NUMBER/ga/$OS/$ARCH/jdk/hotspot/normal/adoptopenjdk"
     rm -rf ${BOOTJDK_DIR}
     mkdir -p ${BOOTJDK_DIR}
-    tar --strip-components=1 -xf ${BOOTJDK_ARCHIVE_DIR}/*.tar.gz -C ${BOOTJDK_DIR}
+    unwrap_file_to_location ${BOOTJDK_ARCHIVE_DIR}/* ${BOOTJDK_DIR}
   else
     rm -rf ${BOOTJDK_DIR}
     mkdir -p ${BOOTJDK_DIR}
     ls ${BOOTJDK_ARCHIVE_DIR}
-    tar --strip-components=1 -xf ${BOOTJDK_ARCHIVE_DIR}/*${ARCH}.tarxz -C ${BOOTJDK_DIR}
+    unwrap_file_to_location ${BOOTJDK_ARCHIVE_DIR}/*${ARCH}.tarxz ${BOOTJDK_DIR}
   fi
 }
 
