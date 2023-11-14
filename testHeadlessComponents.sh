@@ -26,7 +26,7 @@ if [ "$platform" == "Linux" ]; then
 elif [ "$platform" == "Darwin" ]; then
     # Mac-specific code
     OS="mac"
-elif [ "$platform" == "CYGWIN_NT-10.0" ]; then
+elif [ "${platform#"MINGW64_NT"}" != "$platform" ]; then
     # Windows (Cygwin) specific code
     OS="windows"
 else
