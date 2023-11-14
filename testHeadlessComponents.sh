@@ -39,6 +39,16 @@ function unwrap_file_to_location() {
     tar --strip-components=1 -xf $1 -C $2
   elif [ "$OS" == "windows" ]; then
     unzip $1 -d $2
+    # Get the name of the extracted folder (assuming only one folder is present)
+    extracted_folder_name=$(find "$2" -maxdepth 1 -type d -printf "%f\n")
+
+    # Ensure only one folder is found
+    if [ "$(find "$2" -maxdepth 1 -type d | wc -l)" -eq 1 ]; then
+        # Move the contents to the desired destination without creating a new directory
+        mv "$2/$extracted_folder_name"/* "$2"
+    else
+        echo "Error: More than one directory found in $2."
+    fi
   fi
 }
 
