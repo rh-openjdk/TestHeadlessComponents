@@ -40,6 +40,7 @@ function unwrap_file_to_location() {
   elif [ "$OS" == "windows" ]; then
     unzip $1 -d $2
     # Get the name of the extracted folder (assuming only one folder is present)
+    ls $2
     extracted_folder_name=$(find "$2/" -maxdepth 1 -type d -printf "%f\n")
 
     # Ensure only one folder is found
