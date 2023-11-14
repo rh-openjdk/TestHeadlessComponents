@@ -9,7 +9,7 @@ on:
       - "*"
 env:
   jdkver_latest: 21
-  WORKSPACE: /home/runner/workspace
+  WORKSPACE: ~/workspace
 
 jobs:
   test-temurin-sdk:
