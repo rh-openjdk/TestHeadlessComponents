@@ -9,7 +9,7 @@ on:
       - "*"
 env:
   jdkver_latest: 21
-  WORKSPACE: ~/workspace
+  WORKSPACE: /home/runner/workspace
 
 jobs:
   test-temurin-sdk:
@@ -156,5 +156,5 @@ jobs:
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre" WORKSPACE=/Users/username/workspace
           ./testHeadlessComponents.sh
