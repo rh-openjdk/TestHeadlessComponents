@@ -180,7 +180,7 @@ ls $WORKSPACE
 pushd $WORKSPACE/testHeadlessComponents/jreTestingSwingComponents/src
 
 cp=`mktemp -d`
-$JAVAC_BINARY `find --type f | grep .java` -d $cp
+$JAVAC_BINARY `find -type f | grep .java` -d $cp
 
 declare -A resArray
 set +e
