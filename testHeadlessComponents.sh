@@ -171,7 +171,7 @@ LOGFILE=$TMPRESULTS/testHeadlessComponent.log
 installAlternativeJDK
 
 JAVAC_BINARY="${BOOTJDK_DIR}/bin/javac"
-ls ${BOOTJDK_DIR}
+ls ${BOOTJDK_DIR}/Contents
 
 #use bootjdk javac
 #other classes depend on this one, so we might as well just compile the main class
