@@ -175,6 +175,7 @@ JAVAC_BINARY="${BOOTJDK_DIR}/bin/javac"
 #use bootjdk javac
 #other classes depend on this one, so we might as well just compile the main class
 cp -r $SCRIPT_DIR/testHeadlessComponents/ $WORKSPACE
+ls $WORKSPACE
 pushd $WORKSPACE/testHeadlessComponents/jreTestingSwingComponents/src
 
 cp=`mktemp -d`
