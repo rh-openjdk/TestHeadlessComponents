@@ -172,7 +172,7 @@ installAlternativeJDK
 
 JAVAC_BINARY="${BOOTJDK_DIR}/bin/javac"
 if [ "$OS" == "mac" ]; then
-  JAVAC_BINARY="${BOOTJDK_DIR}/Contents/Home/bin/javac
+  JAVAC_BINARY="${BOOTJDK_DIR}/Contents/Home/bin/javac"
 fi
 
 #use bootjdk javac
