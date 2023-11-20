@@ -228,7 +228,7 @@ printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREP
 echo "$BODY" >> $XMLREPORT
 printXmlFooter >> $XMLREPORT
 
-echo $JAVA_HOME
+ls $JAVA_HOME
 
 for val in ${resArray[@]}; do
   if [[ "$val" -ne "0" ]]; then
