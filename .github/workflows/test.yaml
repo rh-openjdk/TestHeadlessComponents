@@ -153,6 +153,7 @@ jobs:
         run: |
           brew update
           brew install bash
+          echo "shell=/usr/local/bin/bash" >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
