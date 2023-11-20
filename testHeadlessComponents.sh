@@ -234,4 +234,6 @@ for val in ${resArray[@]}; do
   fi
 done
 
+echo $JAVA_HOME
+
 exit 0
