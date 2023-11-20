@@ -173,4 +173,4 @@ jobs:
         run: | 
           echo $BASH_VERSION
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre" WORKSPACE=/Users/runner/workspace
-          ./testHeadlessComponents.sh
+          /usr/local/bin/bash testHeadlessComponents.sh
