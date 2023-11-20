@@ -36,7 +36,7 @@ fi
 
 function unwrap_file_to_location() {
   if [ "$OS" == "mac" -o "$OS" == "linux" ]; then
-    tar --strip-components=1 -xf $1 -C $2
+    tar --strip-components=1 -xvf $1 -C $2
   elif [ "$OS" == "windows" ]; then
     unzip $1 -d $2
     # Get the name of the extracted folder (assuming only one folder is present)
