@@ -159,7 +159,7 @@ jobs:
         run: brew install bash
   
       - name: Update Shell Configuration
-        run: echo '/usr/local/bin/bash' | sudo tee -a /etc/shells && chsh -s /usr/local/bin/bash
+        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
   
       - name: Verify Bash Version
         run: /usr/local/bin/bash --version
