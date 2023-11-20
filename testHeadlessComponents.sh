@@ -23,12 +23,16 @@ platform="$(uname)"
 if [ "$platform" == "Linux" ]; then
     # Linux-specific code
     OS="linux"
+    JAVA=$JAVA_HOME/bin/java
 elif [ "$platform" == "Darwin" ]; then
     # Mac-specific code
     OS="mac"
+    ls $JAVA_HOME/release
+    JAVA=java
 elif [ "${platform#"MINGW64_NT"}" != "$platform" ]; then
     # Windows (Cygwin) specific code
     OS="windows"
+    JAVA=$JAVA_HOME/bin/java
 else
     echo "Unsupported platform"
     exit 1
@@ -80,7 +84,7 @@ function installAlternativeJDK() {
 
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
-  java -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JRESDK -displayValue=$DISPLAY
+  $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JRESDK -displayValue=$DISPLAY
 }
 
 function run_swing_component_test_unset {
@@ -227,8 +231,6 @@ XMLREPORT=$TMPRESULTS/testHeadlessComponent.jtr.xml
 printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
 echo "$BODY" >> $XMLREPORT
 printXmlFooter >> $XMLREPORT
-
-ls $JAVA_HOME
 
 for val in ${resArray[@]}; do
   if [[ "$val" -ne "0" ]]; then
