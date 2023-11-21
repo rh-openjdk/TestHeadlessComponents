@@ -27,7 +27,7 @@ if [ "$platform" == "Linux" ]; then
 elif [ "$platform" == "Darwin" ]; then
     # Mac-specific code
     OS="mac"
-    ls $JAVA_HOME/release
+    ls $JAVA_HOME/
     JAVA=java
 elif [ "${platform#"MINGW64_NT"}" != "$platform" ]; then
     # Windows (Cygwin) specific code
