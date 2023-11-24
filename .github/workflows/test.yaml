@@ -128,6 +128,16 @@ jobs:
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
           ./testHeadlessComponents.sh
+      - name: Pack results
+        if: ${{ always() }}
+        run: |
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+        continue-on-error: true
 
   test-windows-jdk:
     name: "Windows-jdk"
@@ -165,6 +175,16 @@ jobs:
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
           ./testHeadlessComponents.sh
+      - name: Pack results
+        if: ${{ always() }}
+        run: |
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+        continue-on-error: true
           
   test-macos-jre:
     name: "MacOS-jre"
@@ -211,6 +231,16 @@ jobs:
           echo $BASH_VERSION
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre" WORKSPACE=/Users/runner/workspace
           /usr/local/bin/bash testHeadlessComponents.sh
+      - name: Pack results
+        if: ${{ always() }}
+        run: |
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+        continue-on-error: true
 
   test-macos-jdk:
     name: "MacOS-jdk"
@@ -257,4 +287,15 @@ jobs:
           echo $BASH_VERSION
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jdk" WORKSPACE=/Users/runner/workspace
           /usr/local/bin/bash testHeadlessComponents.sh
+      - name: Pack results
+        if: ${{ always() }}
+        run: |
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+        continue-on-error: true
+
 
