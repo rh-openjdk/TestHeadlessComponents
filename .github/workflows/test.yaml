@@ -12,8 +12,8 @@ env:
   WORKSPACE: /home/runner/workspace
 
 jobs:
-  test-temurin-sdk:
-    name: "Temurin jdk"
+  test-linux-sdk:
+    name: "Linux jdk"
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
@@ -52,8 +52,8 @@ jobs:
           path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
         
-  test-temurin-jre:
-    name: "Temurin jre"
+  test-linux-jre:
+    name: "Linux jre"
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
@@ -94,6 +94,43 @@ jobs:
 
   test-windows-jre:
     name: "Windows-jre"
+    runs-on: "windows-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: wget tar git unzip
+
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - name: Run
+        shell: msys2 {0}
+        run: | 
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre"
+          ./testHeadlessComponents.sh
+
+  test-windows-jdk:
+    name: "Windows-jdk"
     runs-on: "windows-latest"
     strategy:
       fail-fast: false
@@ -174,3 +211,50 @@ jobs:
           echo $BASH_VERSION
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jre" WORKSPACE=/Users/runner/workspace
           /usr/local/bin/bash testHeadlessComponents.sh
+
+  test-macos-jdk:
+    name: "MacOS-jdk"
+    runs-on: "macos-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        jdkconf:
+          - JDK 8
+          - JDK 11
+          - JDK 17
+          - JDK Latest
+        include:
+          - jdkconf: JDK 8
+            jdkver: "8"
+          - jdkconf: JDK 11
+            jdkver: "11"
+          - jdkconf: JDK 17
+            jdkver: "17"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo 'eval $(/usr/local/bin/brew shellenv)' >> $HOME/.zprofile
+          eval $(/usr/local/bin/brew shellenv)
+  
+      - name: Install Bash with Homebrew
+        run: brew install bash
+  
+      - name: Update Shell Configuration
+        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
+  
+      - name: Verify Bash Version
+        run: /usr/local/bin/bash --version
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdkver || env.jdkver_latest }}
+      - name: Run
+        run: | 
+          echo $BASH_VERSION
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jdk" WORKSPACE=/Users/runner/workspace
+          /usr/local/bin/bash testHeadlessComponents.sh
+
