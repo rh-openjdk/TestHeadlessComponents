@@ -245,6 +245,8 @@ jobs:
   test-macos-jdk:
     name: "MacOS-jdk"
     runs-on: "macos-latest"
+    env:
+      WORKSPACE: /home/runner/workspace
     strategy:
       fail-fast: false
       matrix:
@@ -285,7 +287,7 @@ jobs:
       - name: Run
         run: | 
           echo $BASH_VERSION
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jdk" WORKSPACE=/Users/runner/workspace
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JRESDK="jdk"
           /usr/local/bin/bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
