@@ -180,6 +180,7 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "$WORKSPACE"
+          ls "$WORKSPACE"
           tar -czf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "\home\runner\workspace\testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
