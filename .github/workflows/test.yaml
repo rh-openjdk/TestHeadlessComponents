@@ -131,7 +131,7 @@ jobs:
       - name: Pack results
         if: ${{ always() }}
         run: |
-          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "$WORKSPACE/testHeadlessComponent.log" "$WORKSPACE/testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
@@ -178,7 +178,7 @@ jobs:
       - name: Pack results
         if: ${{ always() }}
         run: |
-          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "$WORKSPACE/testHeadlessComponent.log" "$WORKSPACE/testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
@@ -234,6 +234,7 @@ jobs:
       - name: Pack results
         if: ${{ always() }}
         run: |
+          export WORKSPACE=/Users/runner/workspace
           tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
