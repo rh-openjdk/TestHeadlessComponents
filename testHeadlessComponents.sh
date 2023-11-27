@@ -232,6 +232,7 @@ if [ "$OS" == "windows" ]; then
   printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" | Out-File -FilePath $XMLREPORT
   echo "$BODY" | Out-File -FilePath $XMLREPORT
   printXmlFooter | Out-File -FilePath $XMLREPORT
+  ls $XMLREPORT
 else
   printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
   echo "$BODY" >> $XMLREPORT
