@@ -178,10 +178,11 @@ jobs:
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
+        shell: msys2 {0}
         run: |
           echo "$WORKSPACE"
           ls "$WORKSPACE"
-          tar -C "\home\runner\workspace" -czf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "testHeadlessComponent.jtr.xml"
+          tar -czf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "$WORKSPACE/testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
