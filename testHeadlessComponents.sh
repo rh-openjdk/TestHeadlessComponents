@@ -127,12 +127,12 @@ function processResults {
   if [ $1 -eq 0 ]; then
     let "PASSED+=1"
     TEST=$(printXmlTest "thc" "$2" "0")
-    BODY+="$TEST
+    BODY+="$TEST"
     echo "$2 PASSED\n"
   else
     let "FAILED+=1"
     TEST=$(printXmlTest "thc" "$2" "0" "$LOGFILE" "$LOGFILE")
-    BODY+="$TEST
+    BODY+="$TEST"
     echo "$2 FAILED\n"
   fi
 
