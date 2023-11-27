@@ -132,7 +132,7 @@ jobs:
         if: ${{ always() }}
         shell: msys2 {0}
         run: |
-          tar -cf "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
@@ -180,7 +180,7 @@ jobs:
         if: ${{ always() }}
         shell: msys2 {0}
         run: |
-          tar -cf "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
