@@ -228,16 +228,10 @@ done
 let "TESTS = $FAILED + $PASSED + $IGNORED"
 
 XMLREPORT=$TMPRESULTS/testHeadlessComponent.jtr.xml
-if [ "$OS" == "windows" ]; then
-  printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" | Out-File -FilePath $XMLREPORT
-  echo "$BODY" | Out-File -FilePath $XMLREPORT
-  printXmlFooter | Out-File -FilePath $XMLREPORT
-  ls $XMLREPORT
-else
-  printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
-  echo "$BODY" >> $XMLREPORT
-  printXmlFooter >> $XMLREPORT
-fi
+printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
+echo "$BODY" >> $XMLREPORT
+printXmlFooter >> $XMLREPORT
+ls -la $XMLREPORT
 
 ls 
 
