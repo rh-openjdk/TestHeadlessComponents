@@ -44,12 +44,12 @@ jobs:
       - name: Pack results
         if: ${{ always() }}
         run: |
-          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-linux-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+          path: "results-linux-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
         
   test-linux-jre:
@@ -84,12 +84,12 @@ jobs:
       - name: Pack results
         if: ${{ always() }}
         run: |
-          tar -cf "results-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          path: "results-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+          path: "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
 
   test-windows-jre:
@@ -132,12 +132,12 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "$WORKSPACE"
-          tar -czf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "\home\runner\workspace\testHeadlessComponent.jtr.xml"
+          tar -czf "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "\home\runner\workspace\testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+          path: "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
 
   test-windows-jdk:
@@ -181,12 +181,12 @@ jobs:
         run: |
           echo "$WORKSPACE"
           ls "$WORKSPACE"
-          tar -czf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "\home\runner\workspace\testHeadlessComponent.jtr.xml"
+          tar -czf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "\home\runner\workspace\testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+          path: "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
           
   test-macos-jre:
@@ -238,12 +238,12 @@ jobs:
         if: ${{ always() }}
         run: |
           export WORKSPACE=/Users/runner/workspace
-          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-macos-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+          path: "results-macos-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
 
   test-macos-jdk:
@@ -297,12 +297,12 @@ jobs:
         if: ${{ always() }}
         run: |
           export WORKSPACE=/Users/runner/workspace
-          tar -cf "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
+          tar -cf "results-macos-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          path: "results-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
+          path: "results-macos-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
 
 
