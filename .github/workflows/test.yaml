@@ -181,7 +181,7 @@ jobs:
         run: |
           echo "$WORKSPACE"
           ls "$WORKSPACE"
-          tar -czf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "\home\runner\workspace\testHeadlessComponent.jtr.xml"
+          tar -C "$WORKSPACE" -czf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" "testHeadlessComponent.jtr.xml"
       - name: Upload results
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
