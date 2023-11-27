@@ -126,15 +126,13 @@ function processResults {
 
   if [ $1 -eq 0 ]; then
     let "PASSED+=1"
-    TEST=$(printXmlTest "tps" "$2" "0")
+    TEST=$(printXmlTest "thc" "$2" "0")
     BODY+="$TEST
-    " # new line to improve clarity, also is used in TPS/tesultsToJtregs.sh
     echo "$2 PASSED\n"
   else
     let "FAILED+=1"
-    TEST=$(printXmlTest "tps" "$2" "0" "$LOGFILE" "$LOGFILE")
+    TEST=$(printXmlTest "thc" "$2" "0" "$LOGFILE" "$LOGFILE")
     BODY+="$TEST
-    " # new line to improve clarity, also is used in TPS/tesultsToJtregs.sh
     echo "$2 FAILED\n"
   fi
 
