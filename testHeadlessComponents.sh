@@ -62,10 +62,6 @@ function installAlternativeJDK() {
   if [ "x$BOOTJDK_DIR" == "x" ]; then
     BOOTJDK_DIR=~/bootjdk
   fi
-  if [ ! "x$ALTERNATE_BOOT_JDK" == "x" ] ; then
-    ALTERNATIVE_JDK_DIR=$ALTERNATE_BOOT_JDK
-    return 0
-  fi
   if [ "x$BOOTJDK_ARCHIVE_DIR" == "x" ]; then
     BOOTJDK_ARCHIVE_DIR=$WORKSPACE/bootjdkarchive
     mkdir -p $BOOTJDK_ARCHIVE_DIR
@@ -84,7 +80,7 @@ function installAlternativeJDK() {
 
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
-  $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JRESDK -displayValue=$DISPLAY
+  $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JREJDK -displayValue=$DISPLAY
 }
 
 function run_swing_component_test_unset {
@@ -153,13 +149,15 @@ source ${RFaT}/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
   WORKSPACE=~/workspace
-  mkdir -p $WORKSPACE
 fi
+
+mkdir -p $WORKSPACE
 
 if [ "x$TMPRESULTS" == "x" ]; then
   TMPRESULTS=$WORKSPACE
-  mkdir -p $TMPRESULTS
 fi
+
+mkdir -p $TMPRESULTS
 
 touch $TMPRESULTS/testHeadlessComponent.txt
 
@@ -189,26 +187,24 @@ $JAVAC_BINARY `find . -type f -name "*.java"` -d $cp
 declare -A resArray
 set +e
 
-if [[ -z "${OTOOL_ARCH}" ]] ; then
+if [[ -z "${ARCH}" ]] ; then
     RUN_ARCH=$(uname -m)
-else
-    RUN_ARCH=$OTOOL_ARCH
 fi
 
 for testOption in compatible incompatible; do
   for headless in true false; do
-    if [[ "$JRESDK" == "jre" || "$JRESDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
+    if [[ "$JREJDK" == "jre" || "$JREJDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
       run_swing_component_test_unset ${testOption} ${headless} >> $LOGFILE 2>&1
       resArray["jre_headless_${testOption}_${headless}_display_unset"]=$?
     fi
   
-    if [[ "x$XDISPLAY" == *x* ]] ; then
+    if [[ "x$XDISPLAY" == "x" ]] ; then
       echo "skipping tests with display set, as the default display was not defined"
     else
       run_swing_component_test_set ${testOption} ${headless} >> $LOGFILE 2>&1
       resArray["jre_headless_${testOption}_${headless}_display_set"]=$?
     fi
-    if [[ "$JRESDK" == "jre" || "$JRESDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
+    if [[ "$JREJDK" == "jre" || "$JREJDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
       run_swing_component_test_fake ${testOption} ${headless} >> $LOGFILE 2>&1
       resArray["jre_headless_${testOption}_${headless}_display_fake"]=$?
     fi
