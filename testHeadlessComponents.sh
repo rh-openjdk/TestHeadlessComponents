@@ -149,13 +149,15 @@ source ${RFaT}/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
   WORKSPACE=~/workspace
-  mkdir -p $WORKSPACE
 fi
+
+mkdir -p $WORKSPACE
 
 if [ "x$TMPRESULTS" == "x" ]; then
   TMPRESULTS=$WORKSPACE
-  mkdir -p $TMPRESULTS
 fi
+
+mkdir -p $TMPRESULTS
 
 touch $TMPRESULTS/testHeadlessComponent.txt
 
