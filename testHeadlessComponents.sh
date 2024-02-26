@@ -30,7 +30,11 @@ elif [ "$platform" == "Darwin" ]; then
     JAVA=$JAVA_HOME/bin/java
     #JAVA=java
 elif [ "${platform#"MINGW64_NT"}" != "$platform" ]; then
-    # Windows (Cygwin) specific code
+    # Windows (MinGW) specific code
+    OS="windows"
+    JAVA=$JAVA_HOME/bin/java
+elif [ "${platform#"CYGWIN_NT"}" != "$platform" ]; then
+    # Windows (CygWin) specific code
     OS="windows"
     JAVA=$JAVA_HOME/bin/java
 else
