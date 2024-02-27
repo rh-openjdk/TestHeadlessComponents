@@ -122,21 +122,6 @@ function run_swing_component_test_fake {
   run_java_with_headless $TEST_BOOL $TEST_ARGUMENT
 }
 
-function processResults {
-
-  if [ $1 -eq 0 ]; then
-    let "PASSED+=1"
-    TEST=$(printXmlTest "thc" "$2" "0")
-    BODY+="$TEST"
-    echo "$2 PASSED\n"
-  else
-    let "FAILED+=1"
-    TEST=$(printXmlTest "thc" "$2" "0" "$LOGFILE" "$LOGFILE")
-    BODY+="$TEST"
-    echo "$2 FAILED\n"
-  fi
-
-}
 set -e
 FAILED=0
 PASSED=0
@@ -216,21 +201,21 @@ for testOption in compatible incompatible; do
   for headless in true false; do
     if [[ "$JREJDK" == "jre" || "$JREJDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
       run_swing_component_test_unset ${testOption} ${headless} > $CURRENT_LOG 2>&1
-      cat $CURRENT_LOG >> $LOGFILE
       processTestResultIntoBodyLine "jre_headless_${testOption}_${headless}_display_unset" "$?" "$CURRENT_LOG"
+      cat $CURRENT_LOG >> $LOGFILE
     fi
   
     if [[ "x$XDISPLAY" == "x" ]] ; then
       echo "skipping tests with display set, as the default display was not defined"
     else
       run_swing_component_test_set ${testOption} ${headless} > $CURRENT_LOG 2>&1
-      cat $CURRENT_LOG >> $LOGFILE
       processTestResultIntoBodyLine "jre_headless_${testOption}_${headless}_display_set" "$?" "$CURRENT_LOG"
+      cat $CURRENT_LOG >> $LOGFILE
     fi
     if [[ "$JREJDK" == "jre" || "$JREJDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
       run_swing_component_test_fake ${testOption} ${headless} > $CURRENT_LOG 2>&1
-      cat $CURRENT_LOG >> $LOGFILE
       processTestResultIntoBodyLine "jre_headless_${testOption}_${headless}_display_fake" "$?" "$CURRENT_LOG"
+      cat $CURRENT_LOG >> $LOGFILE
     fi
   done
 done
@@ -245,6 +230,7 @@ let "TESTS = $FAILED + $PASSED + $IGNORED"
 
 XMLREPORT=$TMPRESULTS/testHeadlessComponent.jtr.xml
 printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
+
 while IFS= read -r LINE; do
     printf "%s\n" "$LINE" >> "$XMLREPORT"
 done < $BODY_FILE
