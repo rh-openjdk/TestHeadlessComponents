@@ -207,7 +207,6 @@ function processTestResultIntoBodyLine {
     echo $(printXmlTest "thc" "$TEST_NAME" "0" "$CURRENT_LOG" "$CURRENT_LOG") >> $BODY_FILE
     echo "$TEST_NAME FAILED\n"
   fi
-  echo $(printXmlTest "thc" "$2" "0" "$CURRENT_LOG" "$CURRENT_LOG") >> $BODY_FILE
 }
 
 BODY_FILE=$(mktemp)
