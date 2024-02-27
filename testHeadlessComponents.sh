@@ -245,7 +245,12 @@ let "TESTS = $FAILED + $PASSED + $IGNORED"
 
 XMLREPORT=$TMPRESULTS/testHeadlessComponent.jtr.xml
 printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
-cat "$BODY_FILE" >> $XMLREPORT
+while IFS= read -r LINE; do
+    printf "%s\n" "$LINE" >> "$XMLREPORT"
+done < $BODY_FILE
+
+
+#cat "$BODY_FILE" >> $XMLREPORT
 printXmlFooter >> $XMLREPORT
 ls -la $XMLREPORT
 
