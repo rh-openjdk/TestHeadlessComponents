@@ -47,7 +47,7 @@ jobs:
           tar -cf "results-linux-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: "results-linux-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -87,7 +87,7 @@ jobs:
           tar -cf "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -135,7 +135,7 @@ jobs:
           tar -cf "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -183,7 +183,7 @@ jobs:
           tar -cf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -239,7 +239,7 @@ jobs:
           tar -cf "results-macos-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: "results-macos-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -297,7 +297,7 @@ jobs:
           tar -cf "results-macos-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: "results-macos-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
