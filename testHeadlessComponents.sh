@@ -188,48 +188,69 @@ pushd $WORKSPACE/testHeadlessComponents/jreTestingSwingComponents/src
 cp=`mktemp -d`
 $JAVAC_BINARY `find . -type f -name "*.java"` -d $cp
 
-declare -A resArray
 set +e
 
 if [[ -z "${ARCH}" ]] ; then
     RUN_ARCH=$(uname -m)
 fi
 
+function processTestResultIntoBodyLine {
+  TEST_NAME=$1
+  TEST_RESULT=$2
+  CURRENT_LOG=$3
+  if [ $TEST_RESULT -eq 0 ]; then
+    let "PASSED+=1"
+    echo $(printXmlTest "thc" "$TEST_NAME" "0") >> $BODY_FILE
+    echo "$TEST_NAME PASSED\n"
+  else
+    let "FAILED+=1"
+    echo $(printXmlTest "thc" "$TEST_NAME" "0" "$CURRENT_LOG" "$CURRENT_LOG") >> $BODY_FILE
+    echo "$TEST_NAME FAILED\n"
+  fi
+  echo $(printXmlTest "thc" "$2" "0" "$CURRENT_LOG" "$CURRENT_LOG") >> $BODY_FILE
+}
+
+BODY_FILE=$(mktemp)
+#the CURRENT_LOG gets rewritten with every execution but is copied into the LOGFILE every time in its entirety
+CURRENT_LOG=$(mktemp)
 for testOption in compatible incompatible; do
   for headless in true false; do
     if [[ "$JREJDK" == "jre" || "$JREJDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
-      run_swing_component_test_unset ${testOption} ${headless} >> $LOGFILE 2>&1
-      resArray["jre_headless_${testOption}_${headless}_display_unset"]=$?
+      run_swing_component_test_unset ${testOption} ${headless} > $CURRENT_LOG 2>&1
+      cat $CURRENT_LOG >> $LOGFILE
+      processTestResultIntoBodyLine "jre_headless_${testOption}_${headless}_display_unset" "$?" "$CURRENT_LOG"
     fi
   
     if [[ "x$XDISPLAY" == "x" ]] ; then
       echo "skipping tests with display set, as the default display was not defined"
     else
-      run_swing_component_test_set ${testOption} ${headless} >> $LOGFILE 2>&1
-      resArray["jre_headless_${testOption}_${headless}_display_set"]=$?
+      run_swing_component_test_set ${testOption} ${headless} > $CURRENT_LOG 2>&1
+      cat $CURRENT_LOG >> $LOGFILE
+      processTestResultIntoBodyLine "jre_headless_${testOption}_${headless}_display_set" "$?" "$CURRENT_LOG"
     fi
     if [[ "$JREJDK" == "jre" || "$JREJDK" == "jdk" && (("${testOption}${headless}" == "compatibletrue") || ("${testOption}${headless}" == "incompatiblefalse")) ]] ; then
-      run_swing_component_test_fake ${testOption} ${headless} >> $LOGFILE 2>&1
-      resArray["jre_headless_${testOption}_${headless}_display_fake"]=$?
+      run_swing_component_test_fake ${testOption} ${headless} > $CURRENT_LOG 2>&1
+      cat $CURRENT_LOG >> $LOGFILE
+      processTestResultIntoBodyLine "jre_headless_${testOption}_${headless}_display_fake" "$?" "$CURRENT_LOG"
     fi
   done
 done
+
+rm $CURRENT_LOG
 
 popd
 set -e
 set -x
 
-for key in ${!resArray[@]}; do
-  processResults ${resArray[$key]} $key
-done
-
 let "TESTS = $FAILED + $PASSED + $IGNORED"
 
 XMLREPORT=$TMPRESULTS/testHeadlessComponent.jtr.xml
 printXmlHeader $PASSED $FAILED $TESTS $IGNORED "testHeadlessComponent" > $XMLREPORT
-echo "$BODY" >> $XMLREPORT
+cat "$BODY_FILE" >> $XMLREPORT
 printXmlFooter >> $XMLREPORT
 ls -la $XMLREPORT
+
+rm $BODY_FILE
 
 ls 
 
