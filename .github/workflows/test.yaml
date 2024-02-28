@@ -208,21 +208,7 @@ jobs:
             jdkver: "17"
     steps:
       - uses: actions/checkout@v3
-      - name: Install Homebrew
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval $(/usr/local/bin/brew shellenv)' >> $HOME/.zprofile
-          eval $(/usr/local/bin/brew shellenv)
   
-      - name: Install Bash with Homebrew
-        run: brew install bash
-  
-      - name: Update Shell Configuration
-        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
-  
-      - name: Verify Bash Version
-        run: /usr/local/bin/bash --version
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -231,7 +217,7 @@ jobs:
       - name: Run
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" WORKSPACE=/Users/runner/workspace XDISPLAY=":0"
-          /usr/local/bin/bash testHeadlessComponents.sh
+          bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
