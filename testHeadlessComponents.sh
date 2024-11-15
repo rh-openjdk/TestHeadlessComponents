@@ -133,8 +133,6 @@ popd
 
 LOGFILE=$TMPRESULTS/testHeadlessComponent.log
 
-installAlternativeJDK
-
 #JAVA_COMMAND always contains link to the java from the SDK
 
 JAVAC_BINARY="${JAVA_COMMAND}c"
