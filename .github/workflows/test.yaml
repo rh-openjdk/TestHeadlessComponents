@@ -279,7 +279,7 @@ jobs:
         run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
   
       - name: Verify Bash Version
-        run: /usr/local/bin/bash --version
+        run: /bin/bash --version
 
       - name: Set up JDK
         uses: actions/setup-java@v3
