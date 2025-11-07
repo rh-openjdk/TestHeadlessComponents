@@ -39,7 +39,7 @@ jobs:
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jdk"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jdk" JAVA_TO_TEST="${JAVA_HOME}/bin/java" JAVA_COMMAND="${JAVA_HOME}/bin/java"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -79,7 +79,7 @@ jobs:
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" JAVA_TO_TEST="${JAVA_HOME}/bin/java" JAVA_COMMAND="${JAVA_HOME}/bin/java"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -126,7 +126,7 @@ jobs:
       - name: Run
         shell: msys2 {0}
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" JAVA_TO_TEST="${JAVA_HOME}/bin/java" JAVA_COMMAND="${JAVA_HOME}/bin/java"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -174,7 +174,7 @@ jobs:
       - name: Run
         shell: msys2 {0}
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" JAVA_TO_TEST="${JAVA_HOME}/bin/java" JAVA_COMMAND="${JAVA_HOME}/bin/java"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -200,8 +200,6 @@ jobs:
           - JDK 17
           - JDK Latest
         include:
-          - jdkconf: JDK 8
-            jdkver: "8"
           - jdkconf: JDK 11
             jdkver: "11"
           - jdkconf: JDK 17
@@ -221,7 +219,7 @@ jobs:
         run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
   
       - name: Verify Bash Version
-        run: /usr/local/bin/bash --version
+        run: /opt/homebrew/Cellar/bash/5.2.37/bin/bash --version
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -230,8 +228,8 @@ jobs:
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" WORKSPACE=/Users/runner/workspace
-          /usr/local/bin/bash testHeadlessComponents.sh
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" JAVA_COMMAND="${JAVA_HOME}/bin/java"
+          /opt/homebrew/Cellar/bash/5.2.37/bin/bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
@@ -258,8 +256,6 @@ jobs:
           - JDK 17
           - JDK Latest
         include:
-          - jdkconf: JDK 8
-            jdkver: "8"
           - jdkconf: JDK 11
             jdkver: "11"
           - jdkconf: JDK 17
@@ -279,7 +275,7 @@ jobs:
         run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
   
       - name: Verify Bash Version
-        run: /usr/local/bin/bash --version
+        run: /opt/homebrew/Cellar/bash/5.2.37/bin/bash --version
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -288,8 +284,8 @@ jobs:
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jdk" WORKSPACE=/Users/runner/workspace
-          /usr/local/bin/bash testHeadlessComponents.sh
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jdk" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" JAVA_COMMAND="${JAVA_HOME}/bin/java"
+          /opt/homebrew/Cellar/bash/5.2.37/bin/bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
