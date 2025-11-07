@@ -123,6 +123,7 @@ JAVA=$JAVA_TO_TEST
 #cp=`mktemp -d`
 #$JAVAC_BINARY `find . -type f -name "*.java"` -d $cp
 $JAVAC_BINARY `find . -type f -name "*.java"`
+cp="$(pwd)/testHeadlessComponents/jreTestingSwingComponents/src"
 
 declare -A resArray
 set +e
