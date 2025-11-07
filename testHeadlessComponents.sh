@@ -79,13 +79,7 @@ PASSED=0
 IGNORED=0
 BODY=""
 
-if [ "x$RFaT" == "x" ]; then
-  readonly RFaT=`mktemp -d`
-  git clone https://github.com/rh-openjdk/run-folder-as-tests.git ${RFaT} 1>&2
-  ls -l ${RFaT}  1>&2
-fi
-
-source ${RFaT}/jtreg-shell-xml.sh
+source RFaT/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
   WORKSPACE=~/workspace
