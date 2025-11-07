@@ -205,21 +205,16 @@ jobs:
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Homebrew
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Bash with brew
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval $(/usr/local/bin/brew shellenv)' >> $HOME/.zprofile
-          eval $(/usr/local/bin/brew shellenv)
-  
-      - name: Install Bash with Homebrew
-        run: brew install bash
-  
-      - name: Update Shell Configuration
-        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
-  
-      - name: Verify Bash Version
-        run: /opt/homebrew/Cellar/bash/5.2.37/bin/bash --version
+          brew install bash
+          echo "/usr/local/bin/bash" >> $GITHUB_PATH
+
+      - name: Check Bash version
+        run: bash --version
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -229,7 +224,7 @@ jobs:
       - name: Run
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jre" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
-          /opt/homebrew/Cellar/bash/5.2.37/bin/bash testHeadlessComponents.sh
+          bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
@@ -261,22 +256,17 @@ jobs:
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Homebrew
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval $(/usr/local/bin/brew shellenv)' >> $HOME/.zprofile
-          eval $(/usr/local/bin/brew shellenv)
-  
-      - name: Install Bash with Homebrew
-        run: brew install bash
-  
-      - name: Update Shell Configuration
-        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
-  
-      - name: Verify Bash Version
-        run: /opt/homebrew/Cellar/bash/5.2.37/bin/bash --version
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Install Bash with brew
+        run: |
+          brew install bash
+          echo "/usr/local/bin/bash" >> $GITHUB_PATH
+
+      - name: Check Bash version
+        run: bash --version
+  
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -285,7 +275,7 @@ jobs:
       - name: Run
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jdk" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
-          /opt/homebrew/Cellar/bash/5.2.37/bin/bash testHeadlessComponents.sh
+          bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
