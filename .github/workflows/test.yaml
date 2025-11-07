@@ -32,6 +32,9 @@ jobs:
             jdkver: "17"
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -72,6 +75,9 @@ jobs:
             jdkver: "17"
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -112,6 +118,9 @@ jobs:
             jdkver: "17"
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -160,6 +169,9 @@ jobs:
             jdkver: "17"
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -207,6 +219,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install Bash with brew
         run: |
@@ -258,6 +272,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install Bash with brew
         run: |
