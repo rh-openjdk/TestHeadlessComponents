@@ -271,12 +271,6 @@ jobs:
       - name: Install Bash with Homebrew
         run: brew install bash
   
-      - name: Update Shell Configuration
-        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
-  
-      - name: Verify Bash Version
-        run: /opt/homebrew/Cellar/bash/5.2.37/bin/bash --version
-
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -285,7 +279,7 @@ jobs:
       - name: Run
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jdk" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
-          /opt/homebrew/Cellar/bash/5.2.37/bin/bash testHeadlessComponents.sh
+          /usr/local/bin/bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
