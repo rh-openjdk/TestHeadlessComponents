@@ -279,7 +279,7 @@ jobs:
       - name: Run
         run: | 
           export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jdk" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
-          /usr/local/bin/bash testHeadlessComponents.sh
+          ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
