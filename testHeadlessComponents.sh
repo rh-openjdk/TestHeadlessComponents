@@ -7,17 +7,6 @@ set -o pipefail
 ## assumes that both directories with old and new rpms are provided and filled with relevant rpms
 ## this script attempts parallel installation of old and new set of rpms
 
-## resolve folder of this script, following all symlinks,
-## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
-SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
-  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
-  # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
-done
-readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
-
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
   $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JREJDK -displayValue=$DISPLAY
@@ -109,13 +98,6 @@ JAVAC_BINARY="${TEST_JDK_HOME}/bin/javac"
 #JAVA_TO_TEST can contain either link to SDK or JRE java executable, however always the java that we want to test with
 JAVA=$JAVA_TO_TEST
 
-#other classes depend on this one, so we might as well just compile the main class
-#cp -r $SCRIPT_DIR/testHeadlessComponents $WORKSPACE
-#ls $WORKSPACE
-#pushd $WORKSPACE/testHeadlessComponents/jreTestingSwingComponents/src
-
-#cp=`mktemp -d`
-#$JAVAC_BINARY `find . -type f -name "*.java"` -d $cp
 $JAVAC_BINARY `find . -type f -name "*.java"`
 cp="$(pwd)/testHeadlessComponents/jreTestingSwingComponents/src"
 
