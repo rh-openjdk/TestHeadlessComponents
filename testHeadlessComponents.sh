@@ -7,6 +7,17 @@ set -o pipefail
 ## assumes that both directories with old and new rpms are provided and filled with relevant rpms
 ## this script attempts parallel installation of old and new set of rpms
 
+## resolve folder of this script, following all symlinks,
+## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+  # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
+done
+readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
   $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JREJDK -displayValue=$DISPLAY
@@ -68,7 +79,7 @@ PASSED=0
 IGNORED=0
 BODY=""
 
-source RFaT/jtreg-shell-xml.sh
+source $SCRIPT_DIR/RFaT/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
   WORKSPACE=~/workspace
