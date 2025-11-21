@@ -108,9 +108,10 @@ JAVAC_BINARY="${TEST_JDK_HOME}/bin/javac"
 
 #JAVA_TO_TEST can contain either link to SDK or JRE java executable, however always the java that we want to test with
 JAVA=$JAVA_TO_TEST
-
-$JAVAC_BINARY `find $SCRIPT_DIR -type f -name "*.java"`
-cp="$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src"
+pushd $SCRIPT_DIR
+  $JAVAC_BINARY `find . -type f -name "*.java"`
+  cp="$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src"
+popd $SCRIPT_DIR
 
 declare -A resArray
 set +e
