@@ -111,7 +111,7 @@ JAVA=$JAVA_TO_TEST
 pushd $SCRIPT_DIR
   $JAVAC_BINARY `find . -type f -name "*.java"`
   cp="$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src"
-popd $SCRIPT_DIR
+popd
 
 declare -A resArray
 set +e
