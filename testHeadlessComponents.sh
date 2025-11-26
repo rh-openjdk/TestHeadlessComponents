@@ -20,6 +20,8 @@ readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
 
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
+  pwd
+  ls $cp
   $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JREJDK -displayValue=$DISPLAY
 }
 
@@ -96,10 +98,6 @@ mkdir -p $TMPRESULTS
 touch $TMPRESULTS/testHeadlessComponent.txt
 
 
-pushd $WORKSPACE
-
-popd
-
 LOGFILE=$TMPRESULTS/testHeadlessComponent.log
 
 #TEST_JDK_HOME always contains link to the home directory of the available SDK
@@ -110,7 +108,7 @@ JAVAC_BINARY="${TEST_JDK_HOME}/bin/javac"
 JAVA=$JAVA_TO_TEST
 pushd $SCRIPT_DIR
   $JAVAC_BINARY `find . -type f -name "*.java"`
-  cp="testHeadlessComponents/jreTestingSwingComponents/src"
+  cp="$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src"
   ls testHeadlessComponents/jreTestingSwingComponents/src
 popd
 
@@ -141,7 +139,6 @@ for testOption in compatible incompatible; do
   done
 done
 
-popd
 set -e
 set -x
 
