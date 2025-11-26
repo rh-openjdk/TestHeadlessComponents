@@ -1,0 +1,34 @@
+properties([
+    parameters([
+        string(name: 'executionId', defaultValue: UUID.randomUUID().toString(), description: 'Unique execution ID'),
+        string(name: 'ebcShortlist', defaultValue: 'rh-openjdk-qe-jenkins.yml',
+               description: 'This controls the EBC shortlist to use when provisioning a Jenkins node.'),
+        string(name: 'ecosystemTracking', defaultValue: "",
+               description: 'Tracking Map as string often containing information about CI Orchestrator pipeline'),
+        string(name: 'JENKINS_JOBS_BRANCH', defaultValue: 'dev', description: 'Branch of Jenkins jobs to use for scripts execution'),
+        string(name: 'JENKINS_JOBS_ORG', defaultValue: 'cognitive-software-delivery', description: 'GitHub Org of Jenkins jobs to use for scripts execution'),
+        string(name: 'TEST_SUITE_BRANCH', defaultValue: 'main', description: 'Branch to test'),
+        string(name: 'TEST_SUITE_URL',
+               defaultValue: 'git@github.com:rh-openjdk/TestHeadlessComponents.git',
+               description: 'URL to download for prepared suites'),
+        string(name: 'TEST_COMMAND',
+               defaultValue: 'export TMPRESULTS=$(Q)$(REPORTDIR)$(D)report$(Q); \
+                        bash $(TEST_ROOT)$(D)functional$(D)testHeadlessComponents$(D)TestHeadlessComponents$(D)testHeadlessComponents.sh;',
+               description: 'Test command to execute on the target machine'),
+        string(name: 'FILE_SERVER', defaultValue: '',
+               description: 'File server where the final results and artifacts will be stored for Cognitive UI'),
+        string(name: 'JVM_UNDER_TEST_PATH', defaultValue: '',
+               description: 'The location on the fileserver to find the java we want to test against'),
+        string(name: 'REPORTING_JVM', defaultValue: 'REDHAT_JDK_21',
+               description: 'The JVM value to report to cognitive')               
+    ])
+])
+
+timestamps {
+    library 'jenkins-ci-websphere'
+
+    if (shouldSkipDueToSeedJob()) {
+        return;
+    }
+    println "Now you see me!"
+}
