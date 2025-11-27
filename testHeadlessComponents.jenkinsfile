@@ -1,7 +1,7 @@
 properties([
     parameters([
         string(name: 'executionId', defaultValue: UUID.randomUUID().toString(), description: 'Unique execution ID'),
-        string(name: 'ebcShortlist', defaultValue: 'rh-openjdk-qe-jenkins.yml',
+        string(name: 'ebcShortlist', defaultValue: 'jenkins-child.yml',
                description: 'This controls the EBC shortlist to use when provisioning a Jenkins node.'),
         string(name: 'ecosystemTracking', defaultValue: "",
                description: 'Tracking Map as string often containing information about CI Orchestrator pipeline'),
@@ -9,7 +9,7 @@ properties([
         string(name: 'JENKINS_JOBS_ORG', defaultValue: 'cognitive-software-delivery', description: 'GitHub Org of Jenkins jobs to use for scripts execution'),
         string(name: 'TEST_SUITE_BRANCH', defaultValue: 'main', description: 'Branch to test'),
         string(name: 'TEST_SUITE_URL',
-               defaultValue: 'git@github.com:rh-openjdk/TestHeadlessComponents.git',
+               defaultValue: 'https://github.com/rh-openjdk/TestHeadlessComponents.git',
                description: 'URL to download for prepared suites'),
         string(name: 'TEST_COMMAND',
                defaultValue: 'export TMPRESULTS=$(Q)$(REPORTDIR)$(D)report$(Q); \
@@ -27,8 +27,31 @@ properties([
 timestamps {
     library 'jenkins-ci-websphere'
 
-    if (shouldSkipDueToSeedJob()) {
+    if (shouldSkipDueToSeedJob()) {i
         return;
     }
     println "Now you see me!"
-}
+    try {
+        println "Requesting node from " + params.ebcShortlist + " with demand ID " + params.executionId  
+        onEBC(
+            demandId: params.executionId,
+            ebcShortlist: params.ebcShortlist,
+            ebcPriority: params.ebcPriority,
+            autoCompleteAfterXHours: 24
+        ) {
+            stage('testsuite-clone') {
+                reportActivity(name: 'testsuite-clone', executionId: params.executionId) {
+                    println "Cloning the ${params.TEST_SUITE_URL} repo, branch ${params.TEST_SUITE_BRANCH}"
+                    git branch: "${params.TEST_SUITE_BRANCH}", url: "${params.TEST_SUITE_URL}"
+                }
+            }
+
+        }
+
+    } finally {
+        node (label: 'built-in') {
+            cleanupWorkspace()
+        }
+    }
+}    
+
