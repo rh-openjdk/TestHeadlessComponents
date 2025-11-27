@@ -45,6 +45,8 @@ fi
 
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
+  pwd
+  echo $cp
   $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JREJDK -displayValue=$DISPLAY
 }
 
