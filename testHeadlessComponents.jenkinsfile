@@ -48,13 +48,17 @@ timestamps {
             
             stage('jvm-setup') {
                 reportActivity(name: 'jvm-setup', executionId: params.executionId) {
-                    sudo apt install default-jdk
+                    withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
+                        sudo apt install default-jdk
+                    }
                 }
             }
 
             stage('testsuite-run') {
                 reportActivity(name: 'testsuite-run', executionId: params.executionId) {
-                    export JAVA_COMMAND=java JAVA_TO_TEST=/usr/lib/jvm/default-java OJDK_VERSION_NUMBER="17" JREJDK="jdk" TMPRESULTS="~" ; sh testHeadlessComponents.sh ; ls 
+                    withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
+                        export JAVA_COMMAND=java JAVA_TO_TEST=/usr/lib/jvm/default-java OJDK_VERSION_NUMBER="17" JREJDK="jdk" TMPRESULTS="~" ; sh testHeadlessComponents.sh ; ls
+                    }
                 }
             }
         }
