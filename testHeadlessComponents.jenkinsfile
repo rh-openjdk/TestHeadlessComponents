@@ -27,7 +27,7 @@ properties([
 timestamps {
     library 'jenkins-ci-websphere'
 
-    if (shouldSkipDueToSeedJob()) {i
+    if (shouldSkipDueToSeedJob()) {
         return;
     }
     println "Now you see me!"
