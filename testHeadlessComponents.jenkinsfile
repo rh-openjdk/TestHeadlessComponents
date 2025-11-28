@@ -43,6 +43,7 @@ timestamps {
                 reportActivity(name: 'testsuite-clone', executionId: params.executionId) {
                     println "Cloning the ${params.TEST_SUITE_URL} repo, branch ${params.TEST_SUITE_BRANCH}"
                     git branch: "${params.TEST_SUITE_BRANCH}", url: "${params.TEST_SUITE_URL}"
+                    extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true]]
                 }
             }
             
