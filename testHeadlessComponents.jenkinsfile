@@ -49,7 +49,7 @@ timestamps {
             stage('jvm-setup') {
                 reportActivity(name: 'jvm-setup', executionId: params.executionId) {
                     withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
-                        sh "sudo apt install default-jdk"
+                        sh "sudo apt install -y default-jdk"
                     }
                 }
             }
