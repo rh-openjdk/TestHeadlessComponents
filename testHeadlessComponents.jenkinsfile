@@ -45,7 +45,18 @@ timestamps {
                     git branch: "${params.TEST_SUITE_BRANCH}", url: "${params.TEST_SUITE_URL}"
                 }
             }
+            
+            stage('jvm-setup') {
+                reportActivity(name: 'jvm-setup', executionId: params.executionId) {
+                    sudo apt install default-jdk
+                }
+            }
 
+            stage('testsuite-run') {
+                reportActivity(name: 'testsuite-run', executionId: params.executionId) {
+                    export JAVA_COMMAND=java JAVA_TO_TEST=/usr/lib/jvm/default-java OJDK_VERSION_NUMBER="17" JREJDK="jdk" TMPRESULTS="~" ; sh testHeadlessComponents.sh ; ls 
+                }
+            }
         }
 
     } finally {
