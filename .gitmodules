@@ -1,0 +1,3 @@
+[submodule "RFaT"]
+	path = RFaT
+	url = https://github.com/rh-openjdk/run-folder-as-tests.git
