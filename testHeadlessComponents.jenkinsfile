@@ -42,7 +42,19 @@ timestamps {
             stage('testsuite-clone') {
                 reportActivity(name: 'testsuite-clone', executionId: params.executionId) {
                     println "Cloning the ${params.TEST_SUITE_URL} repo, branch ${params.TEST_SUITE_BRANCH}"
-                    git branch: "${params.TEST_SUITE_BRANCH}", url: "${params.TEST_SUITE_URL}"
+        
+                    git(
+                        branch: "${params.TEST_SUITE_BRANCH}",
+                        url: "${params.TEST_SUITE_URL}",
+                        submoduleCfg: [],  // enables submodule handling
+                        changelog: false,
+                        poll: false
+                    )
+        
+                    // initialize & update submodules recursively
+                    sh """
+                        git submodule update --init --recursive
+                    """
                 }
             }
             
