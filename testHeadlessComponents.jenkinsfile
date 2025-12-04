@@ -69,7 +69,7 @@ timestamps {
             stage('testsuite-run') {
                 reportActivity(name: 'testsuite-run', executionId: params.executionId) {
                     withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
-                        sh "export JAVA_COMMAND=java JAVA_TO_TEST=/usr/lib/jvm/default-java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls"
+                        sh "export TEST_JDK_HOME=/usr/lib/jvm/default-java JAVA_TO_TEST=/usr/lib/jvm/default-java/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls"
                     }
                 }
             }
