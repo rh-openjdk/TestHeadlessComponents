@@ -110,7 +110,14 @@ pushd $SCRIPT_DIR
   $JAVAC_BINARY `find . -type f -name "*.java"`
 popd
 
-cp=$(realpath --relative-to="$(pwd)" "$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src")
+cp="$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src"
+
+# in case of windows we need to cygpath the path before passing it to the jdk
+case "$(uname -s)" in
+    MSYS_NT*|MINGW32_NT*|MINGW64_NT*|CYGWIN_NT*)
+        cp="$(cygpath -w "$cp")"
+        ;;
+esac
 
 declare -A resArray
 set +e
