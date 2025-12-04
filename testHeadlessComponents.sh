@@ -108,9 +108,9 @@ JAVAC_BINARY="${TEST_JDK_HOME}/bin/javac"
 JAVA=$JAVA_TO_TEST
 pushd $SCRIPT_DIR
   $JAVAC_BINARY `find . -type f -name "*.java"`
-  cp="TestHeadlessComponents/testHeadlessComponents/jreTestingSwingComponents/src"
-  ls testHeadlessComponents/jreTestingSwingComponents/src
 popd
+
+cp=$(realpath --relative-to="$(pwd)" "$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src")
 
 declare -A resArray
 set +e
