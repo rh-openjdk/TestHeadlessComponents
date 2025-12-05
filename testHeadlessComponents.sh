@@ -18,72 +18,10 @@ while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer 
 done
 readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
 
-# detecting platform
-platform="$(uname)"
-if [ "$platform" == "Linux" ]; then
-    # Linux-specific code
-    OS="linux"
-    JAVA=$JAVA_HOME/bin/java
-elif [ "$platform" == "Darwin" ]; then
-    # Mac-specific code
-    OS="mac"
-    JAVA=$JAVA_HOME/bin/java
-    #JAVA=java
-elif [ "${platform#"MINGW64_NT"}" != "$platform" ]; then
-    # Windows (MinGW) specific code
-    OS="windows"
-    JAVA=$JAVA_HOME/bin/java
-elif [ "${platform#"CYGWIN_NT"}" != "$platform" ]; then
-    # Windows (CygWin) specific code
-    OS="windows"
-    JAVA=$JAVA_HOME/bin/java
-else
-    echo "Unsupported platform"
-    exit 1
-fi
-
-function unwrap_file_to_location() {
-  if [ "$OS" == "mac" -o "$OS" == "linux" ]; then
-    tar --strip-components=1 -xf $1 -C $2
-  elif [ "$OS" == "windows" ]; then
-    unzip $1 -d $2
-    # Get the name of the extracted folder (assuming only one folder is present)
-    ls $2
-    extracted_folder_name=$(ls $2)
-
-    # Ensure only one folder is found
-    if [ "$(ls $2 | wc -l)" -eq 1 ]; then
-        # Move the contents to the desired destination without creating a new directory
-        mv "$2/$extracted_folder_name"/* "$2"
-    else
-        echo "Error: More than one directory found in $2."
-    fi
-  fi
-}
-
-function installAlternativeJDK() {
-  ARCH=$( uname -m )
-  if [ "x$BOOTJDK_DIR" == "x" ]; then
-    BOOTJDK_DIR=~/bootjdk
-  fi
-  if [ "x$BOOTJDK_ARCHIVE_DIR" == "x" ]; then
-    BOOTJDK_ARCHIVE_DIR=$WORKSPACE/bootjdkarchive
-    mkdir -p $BOOTJDK_ARCHIVE_DIR
-    cd $BOOTJDK_ARCHIVE_DIR
-    curl -OLJks "https://api.adoptopenjdk.net/v3/binary/latest/$OJDK_VERSION_NUMBER/ga/$OS/$ARCH/jdk/hotspot/normal/adoptopenjdk"
-    rm -rf ${BOOTJDK_DIR}
-    mkdir -p ${BOOTJDK_DIR}
-    unwrap_file_to_location ${BOOTJDK_ARCHIVE_DIR}/* ${BOOTJDK_DIR}
-  else
-    rm -rf ${BOOTJDK_DIR}
-    mkdir -p ${BOOTJDK_DIR}
-    ls ${BOOTJDK_ARCHIVE_DIR}
-    unwrap_file_to_location ${BOOTJDK_ARCHIVE_DIR}/*${ARCH}.tarxz ${BOOTJDK_DIR}
-  fi
-}
-
 function run_java_with_headless {
   COMPONENTS_TO_TEST=$2
+  pwd
+  ls $cp
   $JAVA -cp $cp -Djava.awt.headless=$1 MainRunner -test=$COMPONENTS_TO_TEST -jreSdkHeadless=$JREJDK -displayValue=$DISPLAY
 }
 
@@ -143,13 +81,7 @@ PASSED=0
 IGNORED=0
 BODY=""
 
-if [ "x$RFaT" == "x" ]; then
-  readonly RFaT=`mktemp -d`
-  git clone https://github.com/rh-openjdk/run-folder-as-tests.git ${RFaT} 1>&2
-  ls -l ${RFaT}  1>&2
-fi
-
-source ${RFaT}/jtreg-shell-xml.sh
+source $SCRIPT_DIR/RFaT/jtreg-shell-xml.sh
 
 if [[ -z "${WORKSPACE}" ]]; then
   WORKSPACE=~/workspace
@@ -166,27 +98,26 @@ mkdir -p $TMPRESULTS
 touch $TMPRESULTS/testHeadlessComponent.txt
 
 
-pushd $WORKSPACE
-
-popd
-
 LOGFILE=$TMPRESULTS/testHeadlessComponent.log
 
-installAlternativeJDK
+#TEST_JDK_HOME always contains link to the home directory of the available SDK
 
-JAVAC_BINARY="${BOOTJDK_DIR}/bin/javac"
-if [ "$OS" == "mac" ]; then
-  JAVAC_BINARY="${BOOTJDK_DIR}/Contents/Home/bin/javac"
-fi
+JAVAC_BINARY="${TEST_JDK_HOME}/bin/javac"
 
-#use bootjdk javac
-#other classes depend on this one, so we might as well just compile the main class
-cp -r $SCRIPT_DIR/testHeadlessComponents $WORKSPACE
-ls $WORKSPACE
-pushd $WORKSPACE/testHeadlessComponents/jreTestingSwingComponents/src
+#JAVA_TO_TEST can contain either link to SDK or JRE java executable, however always the java that we want to test with
+JAVA=$JAVA_TO_TEST
+pushd $SCRIPT_DIR
+  $JAVAC_BINARY `find . -type f -name "*.java"`
+popd
 
-cp=`mktemp -d`
-$JAVAC_BINARY `find . -type f -name "*.java"` -d $cp
+cp="$SCRIPT_DIR/testHeadlessComponents/jreTestingSwingComponents/src"
+
+# in case of windows we need to cygpath the path before passing it to the jdk
+case "$(uname -s)" in
+    MSYS_NT*|MINGW32_NT*|MINGW64_NT*|CYGWIN_NT*)
+        cp="$(cygpath -w "$cp")"
+        ;;
+esac
 
 declare -A resArray
 set +e
@@ -215,7 +146,6 @@ for testOption in compatible incompatible; do
   done
 done
 
-popd
 set -e
 set -x
 

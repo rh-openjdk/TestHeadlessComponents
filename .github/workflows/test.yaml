@@ -31,15 +31,18 @@ jobs:
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jdk"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jdk" JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -47,7 +50,7 @@ jobs:
           tar -cf "results-linux-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: "results-linux-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -71,15 +74,18 @@ jobs:
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jre" JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -87,7 +93,7 @@ jobs:
           tar -cf "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: "results-linux-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -111,22 +117,25 @@ jobs:
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - uses: msys2/setup-msys2@v2
         with:
           update: true
           install: wget tar git unzip
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         shell: msys2 {0}
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jre" JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -135,7 +144,7 @@ jobs:
           tar -cf "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: "results-windows-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -159,22 +168,25 @@ jobs:
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - uses: msys2/setup-msys2@v2
         with:
           update: true
           install: wget tar git unzip
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         shell: msys2 {0}
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre"
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jre" JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
           ./testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
@@ -183,7 +195,7 @@ jobs:
           tar -cf "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: "results-windows-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -200,38 +212,33 @@ jobs:
           - JDK 17
           - JDK Latest
         include:
-          - jdkconf: JDK 8
-            jdkver: "8"
           - jdkconf: JDK 11
             jdkver: "11"
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Homebrew
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Bash with brew
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval $(/usr/local/bin/brew shellenv)' >> $HOME/.zprofile
-          eval $(/usr/local/bin/brew shellenv)
-  
-      - name: Install Bash with Homebrew
-        run: brew install bash
-  
-      - name: Update Shell Configuration
-        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
-  
-      - name: Verify Bash Version
-        run: /usr/local/bin/bash --version
+          brew install bash
+          echo "/usr/local/bin/bash" >> $GITHUB_PATH
+
+      - name: Check Bash version
+        run: bash --version
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jre" WORKSPACE=/Users/runner/workspace
-          /usr/local/bin/bash testHeadlessComponents.sh
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jre" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
+          bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
@@ -239,7 +246,7 @@ jobs:
           tar -cf "results-macos-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: "results-macos-jre${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
@@ -258,38 +265,33 @@ jobs:
           - JDK 17
           - JDK Latest
         include:
-          - jdkconf: JDK 8
-            jdkver: "8"
           - jdkconf: JDK 11
             jdkver: "11"
           - jdkconf: JDK 17
             jdkver: "17"
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Homebrew
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval $(/usr/local/bin/brew shellenv)' >> $HOME/.zprofile
-          eval $(/usr/local/bin/brew shellenv)
-  
-      - name: Install Bash with Homebrew
-        run: brew install bash
-  
-      - name: Update Shell Configuration
-        run: echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.zprofile && exec -l $SHELL
-  
-      - name: Verify Bash Version
-        run: /usr/local/bin/bash --version
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
+      - name: Install Bash with brew
+        run: |
+          brew install bash
+          echo "/usr/local/bin/bash" >> $GITHUB_PATH
+
+      - name: Check Bash version
+        run: bash --version
+  
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.jdkver || env.jdkver_latest }}
       - name: Run
         run: | 
-          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} BOOTJDK_DIR=~/bootjdk JREJDK="jdk" WORKSPACE=/Users/runner/workspace
-          /usr/local/bin/bash testHeadlessComponents.sh
+          export OJDK_VERSION_NUMBER=${{ matrix.jdkver || env.jdkver_latest }} JREJDK="jdk" WORKSPACE=/Users/runner/workspace JAVA_TO_TEST="${JAVA_HOME}/bin/java" TEST_JDK_HOME="${JAVA_HOME}"
+          bash testHeadlessComponents.sh
       - name: Pack results
         if: ${{ always() }}
         run: |
@@ -297,7 +299,7 @@ jobs:
           tar -cf "results-macos-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz" $WORKSPACE/testHeadlessComponent.log $WORKSPACE/testHeadlessComponent.jtr.xml
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: "results-macos-jdk${{ matrix.jdkver || env.jdkver_latest }}.tar.gz"
         continue-on-error: true
