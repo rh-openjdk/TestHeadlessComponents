@@ -1,7 +1,7 @@
 properties([
     parameters([
         string(name: 'executionId', defaultValue: UUID.randomUUID().toString(), description: 'Unique execution ID'),
-        string(name: 'ebcShortlist', defaultValue: 'jenkins-child.yml',
+        string(name: 'ebcShortlist', defaultValue: 'rh-openjdk-qe-rhel9-jenkins.yml',
                description: 'This controls the EBC shortlist to use when provisioning a Jenkins node.'),
         string(name: 'ecosystemTracking', defaultValue: "",
                description: 'Tracking Map as string often containing information about CI Orchestrator pipeline'),
@@ -12,9 +12,11 @@ properties([
                defaultValue: 'https://github.com/rh-openjdk/TestHeadlessComponents.git',
                description: 'URL to download for prepared suites'),
         string(name: 'TEST_COMMAND',
-               defaultValue: 'export TMPRESULTS=$(Q)$(REPORTDIR)$(D)report$(Q); \
-                        bash $(TEST_ROOT)$(D)functional$(D)testHeadlessComponents$(D)TestHeadlessComponents$(D)testHeadlessComponents.sh;',
+               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/default-java JAVA_TO_TEST=/usr/lib/jvm/default-java/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
                description: 'Test command to execute on the target machine'),
+        string(name: 'GET_JAVA_COMMAND',
+               defaultValue: 'sudo apt install -y default-jdk',
+               description: 'The command to get jdk installed.'),
         string(name: 'FILE_SERVER', defaultValue: '',
                description: 'File server where the final results and artifacts will be stored for Cognitive UI'),
         string(name: 'JVM_UNDER_TEST_PATH', defaultValue: '',
@@ -61,7 +63,7 @@ timestamps {
             stage('jvm-setup') {
                 reportActivity(name: 'jvm-setup', executionId: params.executionId) {
                     withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
-                        sh "sudo apt install -y default-jdk"
+                        sh params.GET_JAVA_COMMAND
                     }
                 }
             }
@@ -69,7 +71,7 @@ timestamps {
             stage('testsuite-run') {
                 reportActivity(name: 'testsuite-run', executionId: params.executionId) {
                     withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
-                        sh "export TEST_JDK_HOME=/usr/lib/jvm/default-java JAVA_TO_TEST=/usr/lib/jvm/default-java/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls"
+                        sh params.TEST_COMMAND
                     }
                 }
             }
