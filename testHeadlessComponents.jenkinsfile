@@ -23,8 +23,13 @@ properties([
                description: 'The location on the fileserver to find the java we want to test against'),
         string(name: 'REPORTING_JVM', defaultValue: 'REDHAT_JDK_21',
                description: 'The JVM value to report to cognitive')               
+    ]),
+    // Add a job-level Poll SCM trigger (Koji will be the polled SCM via checkout below)
+    pipelineTriggers([
+    pollSCM('H/5 * * * *') // poll every ~5 minutes; adjust to taste
     ])
 ])
+
 
 timestamps {
     library 'jenkins-ci-websphere'
@@ -41,6 +46,25 @@ timestamps {
             ebcPriority: params.ebcPriority,
             autoCompleteAfterXHours: 24
         ) {
+            stage('koji-fetch') {
+                reportActivity(name: 'koji-fetch', executionId: params.executionId) {
+                    checkout([$class: 'KojiSCM',
+                        kojiTopUrls:      'https://koji.fedoraproject.org/kojihub',
+                        kojiDownloadUrls: 'https://kojipkgs.fedoraproject.org/',
+                        packageName:      'java-17-openjdk',
+                        packageTag:       'f*',
+                        packageArch:      'x86_64,aarch64',
+                        excludeNvrs:      '{*debug*,*src*}',
+                        downloadDir:      'koji-drop',
+                        maxPreviousBuilds: 5,
+                        cleanDestinationDir: true,
+                        createSubdirForEachNvr: true,
+                        poll: true,
+                        changelog: true
+                    ])
+                }
+            }
+
             stage('testsuite-clone') {
                 reportActivity(name: 'testsuite-clone', executionId: params.executionId) {
                     println "Cloning the ${params.TEST_SUITE_URL} repo, branch ${params.TEST_SUITE_BRANCH}"
