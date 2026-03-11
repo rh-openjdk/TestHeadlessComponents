@@ -22,7 +22,42 @@ properties([
         string(name: 'JVM_UNDER_TEST_PATH', defaultValue: '',
                description: 'The location on the fileserver to find the java we want to test against'),
         string(name: 'REPORTING_JVM', defaultValue: 'REDHAT_JDK_21',
-               description: 'The JVM value to report to cognitive')               
+               description: 'The JVM value to report to cognitive'),
+
+        // --- Koji-SCM parameters (all editable at runtime) ---
+        string(name: 'KOJI_TOP_URLS',
+               defaultValue: 'https://koji.fedoraproject.org/kojihub',
+               description: 'Space-separated Koji/Brew hub (XML-RPC) URLs; first reachable is used'),
+        string(name: 'KOJI_DOWNLOAD_URLS',
+               defaultValue: 'https://kojipkgs.fedoraproject.org/',
+               description: 'Space-separated base URLs to download artifacts (first that contains files is used)'),
+        string(name: 'KOJI_PACKAGE_NAME',
+               defaultValue: 'java-17-openjdk',
+               description: 'Package name(s) to watch (space-separated)'),
+        string(name: 'KOJI_PACKAGE_TAG',
+               defaultValue: 'f*',
+               description: 'Glob for allowed tags (empty = all)'),
+        string(name: 'KOJI_PACKAGE_ARCH',
+               defaultValue: 'x86_64,aarch64',
+               description: 'Comma-separated arch list (empty = all)'),
+        string(name: 'KOJI_EXCLUDE_NVRS',
+               defaultValue: '{*debug*,*src*}',
+               description: 'Glob set to exclude NVRs (eg. "{*debug*,*src*}")'),
+        string(name: 'KOJI_DOWNLOAD_DIR',
+               defaultValue: 'koji-drop',
+               description: 'Workspace subdir to place downloaded artifacts (empty = workspace root)'),
+        string(name: 'KOJI_MAX_PREV_BUILDS',
+               defaultValue: '5',
+               description: 'How far back to look when selecting the latest matching build (integer)'),
+        booleanParam(name: 'KOJI_CLEAN_DESTINATION',
+                     defaultValue: true,
+                     description: 'Clean the download directory before fetching'),
+        booleanParam(name: 'KOJI_CREATE_SUBDIR_PER_NVR',
+                     defaultValue: true,
+                     description: 'Create a subdirectory named by NVR for each build'),
+        booleanParam(name: 'KOJI_INCLUDE_IN_CHANGELOG',
+                     defaultValue: true,
+                     description: 'Include Koji in changelog on builds triggered by polling')
     ]),
     // Add a job-level Poll SCM trigger (Koji will be the polled SCM via checkout below)
     pipelineTriggers([
@@ -49,18 +84,19 @@ timestamps {
             stage('koji-fetch') {
                 reportActivity(name: 'koji-fetch', executionId: params.executionId) {
                     checkout([$class: 'KojiSCM',
-                        kojiTopUrls:      'https://koji.fedoraproject.org/kojihub',
-                        kojiDownloadUrls: 'https://kojipkgs.fedoraproject.org/',
-                        packageName:      'java-17-openjdk',
-                        packageTag:       'f*',
-                        packageArch:      'x86_64,aarch64',
-                        excludeNvrs:      '{*debug*,*src*}',
-                        downloadDir:      'koji-drop',
-                        maxPreviousBuilds: 5,
-                        cleanDestinationDir: true,
-                        createSubdirForEachNvr: true,
-                        poll: true,
-                        changelog: true
+                        kojiTopUrls:               params.KOJI_TOP_URLS,
+                        kojiDownloadUrls:          params.KOJI_DOWNLOAD_URLS,
+                        packageName:               params.KOJI_PACKAGE_NAME,
+                        packageTag:                params.KOJI_PACKAGE_TAG,
+                        packageArch:               params.KOJI_PACKAGE_ARCH,
+                        excludeNvrs:               params.KOJI_EXCLUDE_NVRS,
+                        downloadDir:               params.KOJI_DOWNLOAD_DIR,
+                        maxPreviousBuilds:         params.KOJI_MAX_PREV_BUILDS as Integer,
+                        cleanDestinationDir:       params.KOJI_CLEAN_DESTINATION as boolean,
+                        createSubdirForEachNvr:    params.KOJI_CREATE_SUBDIR_PER_NVR as boolean,
+                        // Ensure Koji is polled and (optionally) included in changelog
+                        poll:                      true,
+                        changelog:                 params.KOJI_INCLUDE_IN_CHANGELOG as boolean
                     ])
                 }
             }
