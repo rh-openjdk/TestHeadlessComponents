@@ -48,16 +48,9 @@ properties([
                description: 'Workspace subdir to place downloaded artifacts (empty = workspace root)'),
         string(name: 'KOJI_MAX_PREV_BUILDS',
                defaultValue: '5',
-               description: 'How far back to look when selecting the latest matching build (integer)'),
-        booleanParam(name: 'KOJI_CLEAN_DESTINATION',
-                     defaultValue: true,
-                     description: 'Clean the download directory before fetching'),
-        booleanParam(name: 'KOJI_CREATE_SUBDIR_PER_NVR',
-                     defaultValue: true,
-                     description: 'Create a subdirectory named by NVR for each build'),
-        booleanParam(name: 'KOJI_INCLUDE_IN_CHANGELOG',
-                     defaultValue: true,
-                     description: 'Include Koji in changelog on builds triggered by polling')
+               description: 'Depth for previous builds'),
+        booleanParam(name: 'KOJI_CLEAN_DESTINATION', defaultValue: true, description: 'Clean before download'),
+        booleanParam(name: 'KOJI_CREATE_SUBDIR_PER_NVR', defaultValue: true, description: 'Create subdir per NVR')
     ]),
     // Add a job-level Poll SCM trigger (Koji will be the polled SCM via checkout below)
     pipelineTriggers([
@@ -84,19 +77,22 @@ timestamps {
             stage('koji-fetch') {
                 reportActivity(name: 'koji-fetch', executionId: params.executionId) {
                     checkout([$class: 'KojiSCM',
-                        kojiTopUrls:               params.KOJI_TOP_URLS,
-                        kojiDownloadUrls:          params.KOJI_DOWNLOAD_URLS,
-                        packageName:               params.KOJI_PACKAGE_NAME,
-                        packageTag:                params.KOJI_PACKAGE_TAG,
-                        packageArch:               params.KOJI_PACKAGE_ARCH,
-                        excludeNvrs:               params.KOJI_EXCLUDE_NVRS,
-                        downloadDir:               params.KOJI_DOWNLOAD_DIR,
-                        maxPreviousBuilds:         params.KOJI_MAX_PREV_BUILDS as Integer,
-                        cleanDestinationDir:       params.KOJI_CLEAN_DESTINATION as boolean,
-                        createSubdirForEachNvr:    params.KOJI_CREATE_SUBDIR_PER_NVR as boolean,
-                        // Ensure Koji is polled and (optionally) included in changelog
-                        poll:                      true,
-                        changelog:                 params.KOJI_INCLUDE_IN_CHANGELOG as boolean
+                        kojiBuildProviders: [[
+                            $class: 'KojiSimpleBuildProvider',
+                            packageName: params.KOJI_PACKAGE_NAME,
+                            packageTag: params.KOJI_PACKAGE_TAG,
+                            packageArch: params.KOJI_PACKAGE_ARCH,
+                            excludeNvrs: params.KOJI_EXCLUDE_NVRS
+                        ]],
+                        kojiXmlRpcApi: [
+                            $class: 'KojiXmlRpcApi',
+                            topUrls: params.KOJI_TOP_URLS,
+                            downloadUrls: params.KOJI_DOWNLOAD_URLS
+                        ],
+                        downloadDir: params.KOJI_DOWNLOAD_DIR,
+                        cleanDownloadDir: params.KOJI_CLEAN_DESTINATION,
+                        dirPerNvr: params.KOJI_CREATE_SUBDIR_PER_NVR,
+                        maxPreviousBuilds: params.KOJI_MAX_PREV_BUILDS as Integer
                     ])
                 }
             }
