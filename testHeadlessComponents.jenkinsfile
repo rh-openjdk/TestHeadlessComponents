@@ -39,16 +39,24 @@ properties([
                description: 'Glob for allowed tags (empty = all)'),
         string(name: 'KOJI_PACKAGE_ARCH',
                defaultValue: 'x86_64,aarch64',
-               description: 'Comma-separated arch list (empty = all)'),
-        string(name: 'KOJI_EXCLUDE_NVRS',
+               description: 'Comma-separated architectures; leave empty for all'),
+        string(name: 'KOJI_TAG',
+               defaultValue: 'f*',
+               description: 'Tag glob; leave empty to match all'),
+        string(name: 'KOJI_SUBPACKAGE_DENYLIST',
                defaultValue: '{*debug*,*src*}',
-               description: 'Glob set to exclude NVRs (eg. "{*debug*,*src*}")'),
+               description: 'Subpackage patterns to exclude (glob set or comma-separated)'),
+        string(name: 'KOJI_SUBPACKAGE_ALLOWLIST',
+               defaultValue: '',
+               description: 'Subpackage patterns to allow (optional; empty = all)'),
+
+        // --- Download behavior ---
         string(name: 'KOJI_DOWNLOAD_DIR',
                defaultValue: 'koji-drop',
                description: 'Workspace subdir to place downloaded artifacts (empty = workspace root)'),
         string(name: 'KOJI_MAX_PREV_BUILDS',
                defaultValue: '5',
-               description: 'Depth for previous builds'),
+               description: 'How far back to look when selecting latest match (integer)'),
         booleanParam(name: 'KOJI_CLEAN_DESTINATION', defaultValue: true, description: 'Clean before download'),
         booleanParam(name: 'KOJI_CREATE_SUBDIR_PER_NVR', defaultValue: true, description: 'Create subdir per NVR')
     ]),
@@ -78,21 +86,22 @@ timestamps {
                 reportActivity(name: 'koji-fetch', executionId: params.executionId) {
                     checkout([$class: 'KojiSCM',
                         kojiBuildProviders: [[
-                            $class: 'KojiSimpleBuildProvider',
-                            packageName: params.KOJI_PACKAGE_NAME,
-                            packageTag: params.KOJI_PACKAGE_TAG,
-                            packageArch: params.KOJI_PACKAGE_ARCH,
-                            excludeNvrs: params.KOJI_EXCLUDE_NVRS
+                            $class: 'KojiBuildProvider',
+                            topUrl:      params.KOJI_TOP_URL,
+                            downloadUrl: params.KOJI_DOWNLOAD_URL
                         ]],
                         kojiXmlRpcApi: [
-                            $class: 'KojiXmlRpcApi',
-                            topUrls: params.KOJI_TOP_URLS,
-                            downloadUrls: params.KOJI_DOWNLOAD_URLS
+                            $class: 'RealKojiXmlRpcApi',
+                            packageName:           params.KOJI_PACKAGE_NAME,
+                            arch:                  params.KOJI_ARCH,                 // may be comma-separated per plugin docs [3](https://docs.pagure.org/koji/image_build/)
+                            tag:                   params.KOJI_TAG,
+                            subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
+                            subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
                         ],
-                        downloadDir: params.KOJI_DOWNLOAD_DIR,
-                        cleanDownloadDir: params.KOJI_CLEAN_DESTINATION,
-                        dirPerNvr: params.KOJI_CREATE_SUBDIR_PER_NVR,
-                        maxPreviousBuilds: params.KOJI_MAX_PREV_BUILDS as Integer
+                        downloadDir:        params.KOJI_DOWNLOAD_DIR,
+                        cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
+                        dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
+                        maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
                     ])
                 }
             }
