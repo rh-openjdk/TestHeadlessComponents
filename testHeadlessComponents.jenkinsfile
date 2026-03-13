@@ -87,8 +87,8 @@ timestamps {
                     checkout([$class: 'KojiSCM',
                         kojiBuildProviders: [[
                             $class: 'KojiBuildProvider',
-                            topUrl:      params.KOJI_TOP_URL,
-                            downloadUrl: params.KOJI_DOWNLOAD_URL
+                            topUrl:      params.KOJI_TOP_URLS,
+                            downloadUrl: params.KOJI_DOWNLOAD_URLS
                         ]],
                         kojiXmlRpcApi: [
                             $class: 'RealKojiXmlRpcApi',
