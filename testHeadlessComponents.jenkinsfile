@@ -93,7 +93,7 @@ timestamps {
                         kojiXmlRpcApi: [
                             $class: 'RealKojiXmlRpcApi',
                             packageName:           params.KOJI_PACKAGE_NAME,
-                            arch:                  params.KOJI_ARCH,                 // may be comma-separated per plugin docs [3](https://docs.pagure.org/koji/image_build/)
+                            arch:                  params.KOJI_PACKAGE_ARCH,                 // may be comma-separated per plugin docs [3](https://docs.pagure.org/koji/image_build/)
                             tag:                   params.KOJI_TAG,
                             subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
                             subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
