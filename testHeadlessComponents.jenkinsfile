@@ -1,21 +1,21 @@
 properties([
     parameters([
         string(name: 'executionId', defaultValue: UUID.randomUUID().toString(), description: 'Unique execution ID'),
-        string(name: 'ebcShortlist', defaultValue: 'rh-openjdk-qe-rhel9-jenkins.yml',
+        string(name: 'ebcShortlist', defaultValue: 'rh-openjdk-qe-rhel9-jenkins_medium.yml',
                description: 'This controls the EBC shortlist to use when provisioning a Jenkins node.'),
         string(name: 'ecosystemTracking', defaultValue: "",
                description: 'Tracking Map as string often containing information about CI Orchestrator pipeline'),
         string(name: 'JENKINS_JOBS_BRANCH', defaultValue: 'dev', description: 'Branch of Jenkins jobs to use for scripts execution'),
         string(name: 'JENKINS_JOBS_ORG', defaultValue: 'cognitive-software-delivery', description: 'GitHub Org of Jenkins jobs to use for scripts execution'),
-        string(name: 'TEST_SUITE_BRANCH', defaultValue: 'main', description: 'Branch to test'),
+        string(name: 'TEST_SUITE_BRANCH', defaultValue: 'dev', description: 'Branch to test'),
         string(name: 'TEST_SUITE_URL',
                defaultValue: 'https://github.com/rh-openjdk/TestHeadlessComponents.git',
                description: 'URL to download for prepared suites'),
         string(name: 'TEST_COMMAND',
-               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/default-java JAVA_TO_TEST=/usr/lib/jvm/default-java/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
+               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/java-17-openjdk JAVA_TO_TEST=/usr/lib/jvm/java-17-openjdk/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
                description: 'Test command to execute on the target machine'),
         string(name: 'GET_JAVA_COMMAND',
-               defaultValue: 'sudo apt install -y default-jdk',
+               defaultValue: 'sudo dnf install -y java-17-openjdk-devel',
                description: 'The command to get jdk installed.'),
         string(name: 'FILE_SERVER', defaultValue: '',
                description: 'File server where the final results and artifacts will be stored for Cognitive UI'),
@@ -63,6 +63,8 @@ properties([
     // Add a job-level Poll SCM trigger (Koji will be the polled SCM via checkout below)
     pipelineTriggers([
     pollSCM('H/5 * * * *') // poll every ~5 minutes; adjust to taste
+        string(name: 'REPORTING_JVM', defaultValue: 'REDHAT_JDK_17',
+               description: 'The JVM value to report to cognitive')               
     ])
 ])
 
