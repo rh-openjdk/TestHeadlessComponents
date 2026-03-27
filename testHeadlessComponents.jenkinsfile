@@ -70,33 +70,57 @@ properties([
 timestamps {
     library 'jenkins-ci-websphere'
 
-    // Perform Koji checkout FIRST on built-in node (for polling to work)
+    // Check for new Koji builds WITHOUT downloading
+    def hasNewBuilds = false
     node('built-in') {
-        stage('koji-fetch') {
-            checkout([$class: 'KojiSCM',
-                kojiBuildProviders: [[
-                    $class: 'KojiBuildProvider',
+        stage('koji-check-only') {
+            // Create KojiSCM instance for checking
+            def kojiSCM = new hudson.plugins.scm.koji.KojiSCM(
+                [[
+                    $class: 'hudson.plugins.scm.koji.KojiBuildProvider',
                     topUrl:      params.KOJI_TOP_URLS,
                     downloadUrl: params.KOJI_DOWNLOAD_URLS
                 ]],
-                kojiXmlRpcApi: [
-                    $class: 'RealKojiXmlRpcApi',
+                [
+                    $class: 'hudson.plugins.scm.koji.RealKojiXmlRpcApi',
                     packageName:           params.KOJI_PACKAGE_NAME,
-                    arch:                  params.KOJI_PACKAGE_ARCH,                 // may be comma-separated per plugin docs [3](https://docs.pagure.org/koji/image_build/)
+                    arch:                  params.KOJI_PACKAGE_ARCH,
                     tag:                   params.KOJI_TAG,
                     subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
                     subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
                 ],
-                downloadDir:        params.KOJI_DOWNLOAD_DIR,
-                cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
-                dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
-                maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
-            ])
+                params.KOJI_DOWNLOAD_DIR,
+                params.KOJI_CLEAN_DESTINATION,
+                params.KOJI_CREATE_SUBDIR_PER_NVR,
+                params.KOJI_MAX_PREV_BUILDS as Integer
+            )
+            
+            // Get baseline (previous state)
+            def baseline = kojiSCM.calcRevisionsFromBuild(currentBuild.rawBuild, null, null, listener)
+            
+            // Check for new builds without downloading
+            def pollingResult = kojiSCM.compareRemoteRevisionWith(
+                currentBuild.rawBuild.parent,
+                null,
+                null,
+                listener,
+                baseline
+            )
+            
+            // Set boolean based on result
+            hasNewBuilds = (pollingResult.change != hudson.scm.PollingResult.Change.NONE)
+            
+            echo "New Koji builds available: ${hasNewBuilds}"
+            
+            // Store as environment variable for later stages
+            env.HAS_NEW_KOJI_BUILDS = hasNewBuilds.toString()
         }
     }
 
     // THEN check if we should skip (after polling has occurred)
-    if (shouldSkipDueToSeedJob()) {
+    // Skip if it's a seed job AND there are no new builds
+    if (shouldSkipDueToSeedJob() && !hasNewBuilds) {
+        echo "Skipping: seed job with no new Koji builds"
         return;
     }
 
