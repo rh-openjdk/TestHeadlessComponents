@@ -70,42 +70,43 @@ properties([
 timestamps {
     library 'jenkins-ci-websphere'
 
+    // Perform Koji checkout FIRST on built-in node (for polling to work)
+    stage('koji-fetch') {
+        checkout([$class: 'KojiSCM',
+            kojiBuildProviders: [[
+                $class: 'KojiBuildProvider',
+                topUrl:      params.KOJI_TOP_URLS,
+                downloadUrl: params.KOJI_DOWNLOAD_URLS
+            ]],
+            kojiXmlRpcApi: [
+                $class: 'RealKojiXmlRpcApi',
+                packageName:           params.KOJI_PACKAGE_NAME,
+                arch:                  params.KOJI_PACKAGE_ARCH,                 // may be comma-separated per plugin docs [3](https://docs.pagure.org/koji/image_build/)
+                tag:                   params.KOJI_TAG,
+                subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
+                subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
+            ],
+            downloadDir:        params.KOJI_DOWNLOAD_DIR,
+            cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
+            dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
+            maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
+        ])
+    }
+
+    // THEN check if we should skip (after polling has occurred)
     if (shouldSkipDueToSeedJob()) {
         return;
     }
+
     println "Now you see me!"
     try {
-        println "Requesting node from " + params.ebcShortlist + " with demand ID " + params.executionId  
+        println "Requesting node from " + params.ebcShortlist + " with demand ID " + params.executionId
         onEBC(
             demandId: params.executionId,
             ebcShortlist: params.ebcShortlist,
             ebcPriority: params.ebcPriority,
             autoCompleteAfterXHours: 24
         ) {
-            stage('koji-fetch') {
-                reportActivity(name: 'koji-fetch', executionId: params.executionId) {
-                    checkout([$class: 'KojiSCM',
-                        kojiBuildProviders: [[
-                            $class: 'KojiBuildProvider',
-                            topUrl:      params.KOJI_TOP_URLS,
-                            downloadUrl: params.KOJI_DOWNLOAD_URLS
-                        ]],
-                        kojiXmlRpcApi: [
-                            $class: 'RealKojiXmlRpcApi',
-                            packageName:           params.KOJI_PACKAGE_NAME,
-                            arch:                  params.KOJI_PACKAGE_ARCH,                 // may be comma-separated per plugin docs [3](https://docs.pagure.org/koji/image_build/)
-                            tag:                   params.KOJI_TAG,
-                            subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
-                            subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
-                        ],
-                        downloadDir:        params.KOJI_DOWNLOAD_DIR,
-                        cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
-                        dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
-                        maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
-                    ])
-                }
-            }
-
             stage('testsuite-clone') {
                 reportActivity(name: 'testsuite-clone', executionId: params.executionId) {
                     println "Cloning the ${params.TEST_SUITE_URL} repo, branch ${params.TEST_SUITE_BRANCH}"
@@ -148,4 +149,3 @@ timestamps {
         }
     }
 }    
-
