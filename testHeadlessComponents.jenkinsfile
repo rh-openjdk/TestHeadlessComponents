@@ -74,41 +74,31 @@ timestamps {
     def hasNewBuilds = false
     node('built-in') {
         stage('koji-check-only') {
-            // Create KojiSCM instance for checking
-            def kojiSCM = new hudson.plugins.scm.koji.KojiSCM(
-                [[
-                    $class: 'hudson.plugins.scm.koji.KojiBuildProvider',
+            // Use pollSCM to check for changes without downloading
+            def scmConfig = [
+                $class: 'KojiSCM',
+                kojiBuildProviders: [[
+                    $class: 'KojiBuildProvider',
                     topUrl:      params.KOJI_TOP_URLS,
                     downloadUrl: params.KOJI_DOWNLOAD_URLS
                 ]],
-                [
-                    $class: 'hudson.plugins.scm.koji.RealKojiXmlRpcApi',
+                kojiXmlRpcApi: [
+                    $class: 'RealKojiXmlRpcApi',
                     packageName:           params.KOJI_PACKAGE_NAME,
                     arch:                  params.KOJI_PACKAGE_ARCH,
                     tag:                   params.KOJI_TAG,
                     subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
                     subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
                 ],
-                params.KOJI_DOWNLOAD_DIR,
-                params.KOJI_CLEAN_DESTINATION,
-                params.KOJI_CREATE_SUBDIR_PER_NVR,
-                params.KOJI_MAX_PREV_BUILDS as Integer
-            )
+                downloadDir:        params.KOJI_DOWNLOAD_DIR,
+                cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
+                dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
+                maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
+            ]
             
-            // Get baseline (previous state)
-            def baseline = kojiSCM.calcRevisionsFromBuild(currentBuild.rawBuild, null, null, listener)
-            
-            // Check for new builds without downloading
-            def pollingResult = kojiSCM.compareRemoteRevisionWith(
-                currentBuild.rawBuild.parent,
-                null,
-                null,
-                listener,
-                baseline
-            )
-            
-            // Set boolean based on result
-            hasNewBuilds = (pollingResult.change != hudson.scm.PollingResult.Change.NONE)
+            // Poll SCM to check for changes (doesn't download)
+            def changes = pollSCM(scm: scmConfig)
+            hasNewBuilds = changes
             
             echo "New Koji builds available: ${hasNewBuilds}"
             
