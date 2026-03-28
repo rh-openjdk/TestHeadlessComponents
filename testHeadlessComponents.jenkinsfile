@@ -63,8 +63,6 @@ properties([
     // Add a job-level Poll SCM trigger (Koji will be the polled SCM via checkout below)
     pipelineTriggers([
     pollSCM('H/5 * * * *') // poll every ~5 minutes; adjust to taste
-        string(name: 'REPORTING_JVM', defaultValue: 'REDHAT_JDK_17',
-               description: 'The JVM value to report to cognitive')               
     ])
 ])
 
