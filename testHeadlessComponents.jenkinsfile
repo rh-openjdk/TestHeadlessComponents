@@ -12,7 +12,7 @@ properties([
                defaultValue: 'https://github.com/rh-openjdk/TestHeadlessComponents.git',
                description: 'URL to download for prepared suites'),
         string(name: 'TEST_COMMAND',
-               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/java-latest-openjdk JAVA_TO_TEST=/usr/lib/jvm/java-latest-openjdk/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
+               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/java-21-openjdk JAVA_TO_TEST=/usr/lib/jvm/java-21-openjdk/bin/java OJDK_VERSION_NUMBER=21 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
                description: 'Test command to execute on the target machine'),
         string(name: 'GET_JAVA_COMMAND',
                defaultValue: 'sudo dnf install -y java-17-openjdk-devel',
@@ -32,7 +32,7 @@ properties([
                defaultValue: 'https://kojipkgs.fedoraproject.org/packages/',
                description: 'Space-separated base URLs to download artifacts (first that contains files is used)'),
         string(name: 'KOJI_PACKAGE_NAME',
-               defaultValue: 'java-latest-openjdk',
+               defaultValue: 'java-21-openjdk',
                description: 'Package name(s) to watch (space-separated)'),
         string(name: 'KOJI_PACKAGE_TAG',
                defaultValue: 'el9.* epel9.*',
@@ -79,6 +79,20 @@ timestamps {
                 echo "=== Cleaning Built-in Node Workspace ==="
                 deleteDir() // Delete entire workspace
                 echo "Workspace cleaned"
+                echo "========================================"
+                
+                // Clear Koji XML-RPC cache to force fresh package lookup
+                echo "=== Clearing Koji XML-RPC Cache ==="
+                sh """
+                    CACHE_FILE="\$HOME/kojiscmplugin-xmlrpc.caching"
+                    if [ -f "\$CACHE_FILE" ]; then
+                        echo "Removing cache file: \$CACHE_FILE"
+                        rm -f "\$CACHE_FILE"
+                        echo "Cache file removed"
+                    else
+                        echo "Cache file does not exist: \$CACHE_FILE"
+                    fi
+                """
                 echo "========================================"
                 
                 // Use pollSCM to check for changes without downloading
