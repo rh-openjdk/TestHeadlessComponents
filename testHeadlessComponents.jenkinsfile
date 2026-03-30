@@ -35,13 +35,13 @@ properties([
                defaultValue: 'java-latest-openjdk',
                description: 'Package name(s) to watch (space-separated)'),
         string(name: 'KOJI_PACKAGE_TAG',
-               defaultValue: '',
+               defaultValue: '(supp-|)rhel-9\.8\.[0-9]-(|z-)(nocompose-candidate|openjdk-els-candidate|candidate|gate) rhaos-.*-rhel-9-container-candidate epel9.* el9-openjdk openj9-1-rhel-9-candidate',
                description: 'Glob for allowed tags (empty = all)'),
         string(name: 'KOJI_PACKAGE_ARCH',
                defaultValue: 'x86_64',
                description: 'Comma-separated architectures; leave empty for all'),
         string(name: 'KOJI_TAG',
-               defaultValue: '',
+               defaultValue: '(supp-|)rhel-9\.8\.[0-9]-(|z-)(nocompose-candidate|openjdk-els-candidate|candidate|gate) rhaos-.*-rhel-9-container-candidate epel9.* el9-openjdk openj9-1-rhel-9-candidate',
                description: 'Tag glob; leave empty to match all'),
         string(name: 'KOJI_SUBPACKAGE_DENYLIST',
                defaultValue: '.*debug.*,.*src.*',
@@ -193,21 +193,19 @@ timestamps {
                         maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
                     ])
                     
-                    withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
-                        // Debug: List downloaded files
-                        sh """
-                            echo "=== Downloaded Files Debug ==="
-                            echo "Listing contents of ${params.KOJI_DOWNLOAD_DIR}:"
-                            ls -laR ${params.KOJI_DOWNLOAD_DIR} || echo "Directory not found or empty"
-                            echo "=============================="
-                        """
-                        
-                        // Install RPMs from downloaded Koji build
-                        sh """
-                            echo "Installing RPMs from ${params.KOJI_DOWNLOAD_DIR}"
-                            sudo dnf install -y ${params.KOJI_DOWNLOAD_DIR}/**/*.rpm
-                        """
-                    }
+                    // Debug: List downloaded files
+                    sh """
+                        echo "=== Downloaded Files Debug ==="
+                        echo "Listing contents of ${params.KOJI_DOWNLOAD_DIR}:"
+                        ls -laR ${params.KOJI_DOWNLOAD_DIR} || echo "Directory not found or empty"
+                        echo "=============================="
+                    """
+                    
+                    // Install RPMs from downloaded Koji build
+                    sh """
+                        echo "Installing RPMs from ${params.KOJI_DOWNLOAD_DIR}"
+                        sudo dnf install -y ${params.KOJI_DOWNLOAD_DIR}/**/*.rpm
+                    """
                 }
             }
 
