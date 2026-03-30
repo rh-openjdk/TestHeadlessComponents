@@ -12,7 +12,7 @@ properties([
                defaultValue: 'https://github.com/rh-openjdk/TestHeadlessComponents.git',
                description: 'URL to download for prepared suites'),
         string(name: 'TEST_COMMAND',
-               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/java-17-openjdk JAVA_TO_TEST=/usr/lib/jvm/java-17-openjdk/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
+               defaultValue: 'export TEST_JDK_HOME=/usr/lib/jvm/java-latest-openjdk JAVA_TO_TEST=/usr/lib/jvm/java-latest-openjdk/bin/java OJDK_VERSION_NUMBER=17 JREJDK=jdk TMPRESULTS=tmpresults ; bash testHeadlessComponents.sh ; ls',
                description: 'Test command to execute on the target machine'),
         string(name: 'GET_JAVA_COMMAND',
                defaultValue: 'sudo dnf install -y java-17-openjdk-devel',
@@ -73,37 +73,74 @@ timestamps {
     // Check for new Koji builds WITHOUT downloading
     def hasNewBuilds = false
     node('built-in') {
-        stage('koji-check-only') {
-            // Use pollSCM to check for changes without downloading
-            def scmConfig = [
-                $class: 'KojiSCM',
-                kojiBuildProviders: [[
-                    $class: 'KojiBuildProvider',
-                    topUrl:      params.KOJI_TOP_URLS,
-                    downloadUrl: params.KOJI_DOWNLOAD_URLS
-                ]],
-                kojiXmlRpcApi: [
-                    $class: 'RealKojiXmlRpcApi',
-                    packageName:           params.KOJI_PACKAGE_NAME,
-                    arch:                  params.KOJI_PACKAGE_ARCH,
-                    tag:                   params.KOJI_TAG,
-                    subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
-                    subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
-                ],
-                downloadDir:        params.KOJI_DOWNLOAD_DIR,
-                cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
-                dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
-                maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
-            ]
-            
-            // Poll SCM to check for changes (doesn't download)
-            def changes = pollSCM(scm: scmConfig)
-            hasNewBuilds = changes
-            
-            echo "New Koji builds available: ${hasNewBuilds}"
-            
-            // Store as environment variable for later stages
-            env.HAS_NEW_KOJI_BUILDS = hasNewBuilds.toString()
+        try {
+            stage('koji-check-only') {
+                // Clean workspace and metadata before polling
+                echo "=== Cleaning Built-in Node Workspace ==="
+                deleteDir() // Delete entire workspace
+                
+                // Clean job metadata files
+                def jobDir = currentBuild.rawBuild.getParent().getRootDir()
+                def buildXml = new File(jobDir, "build.xml")
+                def processedHistory = new File(jobDir, "processed-builds-history")
+                
+                if (buildXml.exists()) {
+                    buildXml.delete()
+                    echo "Deleted cached build.xml"
+                }
+                if (processedHistory.exists()) {
+                    processedHistory.delete()
+                    echo "Deleted processed-builds-history"
+                }
+                echo "========================================"
+                
+                // Use pollSCM to check for changes without downloading
+                def scmConfig = [
+                    $class: 'KojiSCM',
+                    kojiBuildProviders: [[
+                        $class: 'KojiBuildProvider',
+                        topUrl:      params.KOJI_TOP_URLS,
+                        downloadUrl: params.KOJI_DOWNLOAD_URLS
+                    ]],
+                    kojiXmlRpcApi: [
+                        $class: 'RealKojiXmlRpcApi',
+                        packageName:           params.KOJI_PACKAGE_NAME,
+                        arch:                  params.KOJI_PACKAGE_ARCH,
+                        tag:                   params.KOJI_TAG,
+                        subpackageDenylist:    params.KOJI_SUBPACKAGE_DENYLIST,
+                        subpackageAllowlist:   params.KOJI_SUBPACKAGE_ALLOWLIST
+                    ],
+                    downloadDir:        params.KOJI_DOWNLOAD_DIR,
+                    cleanDownloadDir:   params.KOJI_CLEAN_DESTINATION,
+                    dirPerNvr:          params.KOJI_CREATE_SUBDIR_PER_NVR,
+                    maxPreviousBuilds:  params.KOJI_MAX_PREV_BUILDS as Integer
+                ]
+                
+                // Poll SCM to check for changes (doesn't download)
+                def changes = pollSCM(scm: scmConfig)
+                hasNewBuilds = changes
+                
+                echo "New Koji builds available: ${hasNewBuilds}"
+                
+                // Store as environment variable for later stages
+                env.HAS_NEW_KOJI_BUILDS = hasNewBuilds.toString()
+            }
+        } finally {
+            // Clean up built-in node workspace after polling
+            stage('koji-cleanup-builtin') {
+                echo "=== Cleaning Built-in Node After Poll ==="
+                deleteDir() // Delete entire workspace
+                
+                // Also clean the download directory if it exists
+                sh """
+                    if [ -d "${params.KOJI_DOWNLOAD_DIR}" ]; then
+                        echo "Removing ${params.KOJI_DOWNLOAD_DIR} from built-in node"
+                        rm -rf ${params.KOJI_DOWNLOAD_DIR}
+                    fi
+                """
+                echo "Built-in node cleanup complete"
+                echo "========================================="
+            }
         }
     }
 
