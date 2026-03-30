@@ -44,7 +44,7 @@ properties([
                defaultValue: '',
                description: 'Tag glob; leave empty to match all'),
         string(name: 'KOJI_SUBPACKAGE_DENYLIST',
-               defaultValue: '{*debug*,*src*}',
+               defaultValue: '.*debug.*,.*src.*',
                description: 'Subpackage patterns to exclude (glob set or comma-separated)'),
         string(name: 'KOJI_SUBPACKAGE_ALLOWLIST',
                defaultValue: '',
