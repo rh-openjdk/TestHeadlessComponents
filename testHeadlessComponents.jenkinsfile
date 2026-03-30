@@ -159,6 +159,19 @@ timestamps {
                     echo "KOJI_MAX_PREV_BUILDS: ${params.KOJI_MAX_PREV_BUILDS}"
                     echo "==============================="
                     
+                    // Clean the download directory before checkout
+                    sh """
+                        echo "=== Cleaning Download Directory ==="
+                        if [ -d "${params.KOJI_DOWNLOAD_DIR}" ]; then
+                            echo "Removing existing directory: ${params.KOJI_DOWNLOAD_DIR}"
+                            rm -rf ${params.KOJI_DOWNLOAD_DIR}
+                            echo "Directory cleaned"
+                        else
+                            echo "Directory ${params.KOJI_DOWNLOAD_DIR} does not exist, nothing to clean"
+                        fi
+                        echo "===================================="
+                    """
+                    
                     // Download latest Koji build
                     checkout([$class: 'KojiSCM',
                         kojiBuildProviders: [[
