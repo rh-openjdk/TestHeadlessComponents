@@ -75,23 +75,10 @@ timestamps {
     node('built-in') {
         try {
             stage('koji-check-only') {
-                // Clean workspace and metadata before polling
+                // Clean workspace before polling
                 echo "=== Cleaning Built-in Node Workspace ==="
                 deleteDir() // Delete entire workspace
-                
-                // Clean job metadata files
-                def jobDir = currentBuild.rawBuild.getParent().getRootDir()
-                def buildXml = new File(jobDir, "build.xml")
-                def processedHistory = new File(jobDir, "processed-builds-history")
-                
-                if (buildXml.exists()) {
-                    buildXml.delete()
-                    echo "Deleted cached build.xml"
-                }
-                if (processedHistory.exists()) {
-                    processedHistory.delete()
-                    echo "Deleted processed-builds-history"
-                }
+                echo "Workspace cleaned"
                 echo "========================================"
                 
                 // Use pollSCM to check for changes without downloading
