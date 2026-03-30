@@ -144,6 +144,21 @@ timestamps {
             
             stage('jvm-setup') {
                 reportActivity(name: 'jvm-setup', executionId: params.executionId) {
+                    // Debug: Print all Koji parameters
+                    echo "=== Koji Configuration Debug ==="
+                    echo "KOJI_TOP_URLS: ${params.KOJI_TOP_URLS}"
+                    echo "KOJI_DOWNLOAD_URLS: ${params.KOJI_DOWNLOAD_URLS}"
+                    echo "KOJI_PACKAGE_NAME: ${params.KOJI_PACKAGE_NAME}"
+                    echo "KOJI_PACKAGE_ARCH: ${params.KOJI_PACKAGE_ARCH}"
+                    echo "KOJI_TAG: ${params.KOJI_TAG}"
+                    echo "KOJI_SUBPACKAGE_DENYLIST: ${params.KOJI_SUBPACKAGE_DENYLIST}"
+                    echo "KOJI_SUBPACKAGE_ALLOWLIST: ${params.KOJI_SUBPACKAGE_ALLOWLIST}"
+                    echo "KOJI_DOWNLOAD_DIR: ${params.KOJI_DOWNLOAD_DIR}"
+                    echo "KOJI_CLEAN_DESTINATION: ${params.KOJI_CLEAN_DESTINATION}"
+                    echo "KOJI_CREATE_SUBDIR_PER_NVR: ${params.KOJI_CREATE_SUBDIR_PER_NVR}"
+                    echo "KOJI_MAX_PREV_BUILDS: ${params.KOJI_MAX_PREV_BUILDS}"
+                    echo "==============================="
+                    
                     // Download latest Koji build
                     checkout([$class: 'KojiSCM',
                         kojiBuildProviders: [[
@@ -166,6 +181,14 @@ timestamps {
                     ])
                     
                     withCredentials([usernamePassword(credentialsId: "intranetId", usernameVariable: 'intranetId_USR', passwordVariable: 'intranetId_PSW')]) {
+                        // Debug: List downloaded files
+                        sh """
+                            echo "=== Downloaded Files Debug ==="
+                            echo "Listing contents of ${params.KOJI_DOWNLOAD_DIR}:"
+                            ls -laR ${params.KOJI_DOWNLOAD_DIR} || echo "Directory not found or empty"
+                            echo "=============================="
+                        """
+                        
                         // Install RPMs from downloaded Koji build
                         sh """
                             echo "Installing RPMs from ${params.KOJI_DOWNLOAD_DIR}"
